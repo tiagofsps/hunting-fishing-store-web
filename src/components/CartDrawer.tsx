@@ -9,6 +9,7 @@ interface CartDrawerProps {
   onUpdateQuantity: (productId: number, itemSku: string | undefined, delta: number) => void;
   onRemoveItem: (productId: number, itemSku?: string) => void;
   onClearCart: () => void;
+  onOpenCheckout: () => void;
 }
 
 export default function CartDrawer({
@@ -18,6 +19,7 @@ export default function CartDrawer({
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
+  onOpenCheckout,
 }: CartDrawerProps) {
   const { t } = useLanguage();
 
@@ -138,7 +140,6 @@ export default function CartDrawer({
                         )}
                       </div>
 
-
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-sm font-black text-ink">
                           {formatCurrency(itemPrice * item.quantity)}
@@ -191,7 +192,10 @@ export default function CartDrawer({
               </div>
 
               <button
-                onClick={() => alert('Demo checkout completed!')}
+                onClick={() => {
+                  onClose();
+                  onOpenCheckout();
+                }}
                 className="w-full rounded-xl bg-ink py-3.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-ink/90 transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
               >
                 <span>{t('cart.checkoutButton')}</span>

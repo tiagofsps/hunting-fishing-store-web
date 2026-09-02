@@ -5,6 +5,7 @@ import HeroSection from './features/home-page/components/HeroSection';
 import ValuePropsSection from './features/home-page/components/ValuePropsSection';
 import ProductSection from './features/home-page/components/ProductSection';
 import QuickViewModal from './features/home-page/components/QuickViewModal';
+import CheckoutModal from './features/checkout/components/CheckoutModal';
 import BrandSection from './features/home-page/components/BrandSection';
 import PromotionBanner from './features/home-page/components/PromotionBanner';
 import CTASection from './features/home-page/components/CTASection';
@@ -21,6 +22,7 @@ export default function App() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
@@ -130,6 +132,7 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onClearCart={handleClearCart}
+        onOpenCheckout={() => setIsCheckoutOpen(true)}
       />
 
       {/* Quick View Modal */}
@@ -138,8 +141,17 @@ export default function App() {
         onClose={() => setQuickViewProduct(null)}
         onAddToCart={handleAddToCart}
       />
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cartItems}
+        onOrderCompleted={handleClearCart}
+      />
     </div>
   );
 }
+
 
 
