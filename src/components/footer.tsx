@@ -1,4 +1,4 @@
-import { useLanguage } from "../i18n/LanguageContext";
+import { useLanguage } from "../i18n/useLanguage";
 import { STORE_CONFIG } from "../config/store";
 
 export default function Footer() {
@@ -94,7 +94,7 @@ export default function Footer() {
                   href="#home"
                   className="hover:text-accent-strong transition-colors"
                 >
-                  Termos &amp; Condições
+                  {t("footer.terms")}
                 </a>
               </li>
               <li>
@@ -102,7 +102,7 @@ export default function Footer() {
                   href="#home"
                   className="hover:text-accent-strong transition-colors"
                 >
-                  Política de Privacidade
+                  {t("footer.privacy")}
                 </a>
               </li>
               <li>
@@ -110,7 +110,7 @@ export default function Footer() {
                   href="#home"
                   className="hover:text-accent-strong transition-colors"
                 >
-                  Licenciamento &amp; Legislação
+                  {t("footer.licensing")}
                 </a>
               </li>
               <li>
@@ -118,7 +118,7 @@ export default function Footer() {
                   href="#home"
                   className="hover:text-accent-strong transition-colors"
                 >
-                  Trocas &amp; Devoluções
+                  {t("footer.returns")}
                 </a>
               </li>
             </ul>
@@ -163,7 +163,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="text-muted hover:text-ink"
             >
-              <span className="sr-only">Facebook</span>FB
+              <span className="sr-only">{t("footer.facebook")}</span>FB
             </a>
             <a
               href={STORE_CONFIG.socials.instagram}
@@ -171,7 +171,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="text-muted hover:text-ink"
             >
-              <span className="sr-only">Instagram</span>IG
+              <span className="sr-only">{t("footer.instagram")}</span>IG
             </a>
             <a
               href={STORE_CONFIG.socials.youtube}
@@ -179,7 +179,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="text-muted hover:text-ink"
             >
-              <span className="sr-only">YouTube</span>YT
+              <span className="sr-only">{t("footer.youtube")}</span>YT
             </a>
           </div>
         </div>

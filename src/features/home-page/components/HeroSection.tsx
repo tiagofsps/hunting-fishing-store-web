@@ -1,4 +1,4 @@
-import { useLanguage } from '../../../i18n/LanguageContext';
+import { useLanguage } from '../../../i18n/useLanguage';
 import { STORE_CONFIG } from '../../../config/store';
 
 export default function HeroSection() {

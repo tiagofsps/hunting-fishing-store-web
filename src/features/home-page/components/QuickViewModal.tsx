@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { Product, ProductItem } from '../types';
-import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency } from '../utils';
-import { useLanguage } from '../../../i18n/LanguageContext';
+import type { Product, ProductItem } from '../../../types';
+import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency } from '../../../utils';
+import { useLanguage } from '../../../i18n/useLanguage';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -12,13 +12,13 @@ interface QuickViewModalProps {
 export default function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModalProps) {
   const { t } = useLanguage();
 
-  if (!product) return null;
-
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedItemId, setSelectedItemId] = useState<number | undefined>(
-    product.items && product.items.length > 0 ? product.items[0].id : undefined
+    product?.items && product.items.length > 0 ? product.items[0].id : undefined
   );
   const [added, setAdded] = useState(false);
+
+  if (!product) return null;
 
   const images = product.images && product.images.length > 0
     ? product.images.map((img) => img.imageUrl)

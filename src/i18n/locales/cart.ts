@@ -16,6 +16,7 @@ export const cartTranslations = {
     'cart.total': 'Total',
     'cart.checkoutButton': 'Complete Order',
     'cart.clearCart': 'Empty Cart',
+    'cart.close': 'Close cart',
   },
   pt: {
     'cart.title': 'O teu Cesto',
@@ -34,5 +35,6 @@ export const cartTranslations = {
     'cart.total': 'Total',
     'cart.checkoutButton': 'Finalizar Encomenda',
     'cart.clearCart': 'Esvaziar Cesto',
+    'cart.close': 'Fechar cesto',
   },
 };

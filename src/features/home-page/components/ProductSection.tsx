@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
-import type { Product, Category, ProductItem } from '../types';
-import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency } from '../utils';
-import { useLanguage } from '../../../i18n/LanguageContext';
+import type { Product, Category, ProductItem } from '../../../types';
+import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency } from '../../../utils';
+import { useLanguage } from '../../../i18n/useLanguage';
+
+type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
 
 interface ProductSectionProps {
   products: Product[];
@@ -23,7 +25,7 @@ export default function ProductSection({
   onQuickView,
 }: ProductSectionProps) {
   const { t } = useLanguage();
-  const [sortOption, setSortOption] = useState<'default' | 'price-asc' | 'price-desc' | 'name'>('default');
+  const [sortOption, setSortOption] = useState<SortOption>('default');
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -99,7 +101,7 @@ export default function ProductSection({
             {/* Sorting Dropdown */}
             <select
               value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as any)}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
               className="h-10 rounded-xl border border-border bg-surface-raised px-3 text-xs font-bold text-ink outline-none focus:border-accent-border cursor-pointer"
             >
               <option value="default">{t('prod.sortDefault')}</option>

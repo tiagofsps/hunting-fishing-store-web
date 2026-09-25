@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as api from './api';
-import type { Product, Category, Brand, Promotion } from './types';
+import type { Product, Category, Brand, Promotion } from '../../types';
 
 export function useHomeData() {
   const [products, setProducts] = useState<Product[]>([]);

@@ -72,6 +72,8 @@ export const homeTranslations = {
     'cta.submitting': 'Sending...',
     'cta.subscribe': 'Subscribe',
     'cta.disclaimer': 'We promise no spam. Unsubscribe at any time.',
+    'cta.errorGeneric': 'Something went wrong. Please try again.',
+    'cta.errorAlreadySubscribed': 'This email is already subscribed.',
   },
   pt: {
     // Hero Section
@@ -146,5 +148,7 @@ export const homeTranslations = {
     'cta.submitting': 'A enviar...',
     'cta.subscribe': 'Subscrever',
     'cta.disclaimer': 'Prometemos não encher a tua caixa de correio. Podes cancelar a qualquer momento.',
+    'cta.errorGeneric': 'Algo correu mal. Tenta novamente.',
+    'cta.errorAlreadySubscribed': 'Este e-mail já está subscrito.',
   },
 };

@@ -1,6 +1,6 @@
-import type { CartItem } from '../features/home-page/types';
-import { formatCurrency, getProductImageUrl, getProductPrice } from '../features/home-page/utils';
-import { useLanguage } from '../i18n/LanguageContext';
+import type { CartItem } from '../types';
+import { formatCurrency, getProductImageUrl, getProductPrice } from '../utils';
+import { useLanguage } from '../i18n/useLanguage';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export default function CartDrawer({
             <button
               onClick={onClose}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-ink hover:bg-surface-hover transition-colors"
-              aria-label="Close cart"
+              aria-label={t('cart.close')}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

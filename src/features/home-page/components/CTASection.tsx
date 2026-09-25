@@ -1,16 +1,40 @@
 import { useState } from 'react';
-import { useLanguage } from '../../../i18n/LanguageContext';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLanguage } from '../../../i18n/useLanguage';
+import { ApiError } from '../../../lib/apiClient';
+import { newsletterSchema, type NewsletterFormData } from '../validation';
+import { subscribeNewsletter } from '../api';
 
 export default function CTASection() {
   const { t } = useLanguage();
-  const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NewsletterFormData>({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: { email: '' },
+  });
+
+  const onSubmit = async (data: NewsletterFormData) => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await subscribeNewsletter(data.email);
       setSubmitted(true);
-      setEmail('');
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setError(t('cta.errorAlreadySubscribed'));
+      } else {
+        setError(t('cta.errorGeneric'));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -33,22 +57,30 @@ export default function CTASection() {
               <p className="text-xs text-white/80 mt-1">{t('cta.successSub')}</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('cta.emailPlaceholder')}
-                className="flex-1 rounded-xl bg-white/10 px-4 py-3.5 text-sm text-white placeholder:text-white/40 border border-white/20 outline-none focus:border-accent"
-              />
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <div className="flex-1">
+                <input
+                  type="email"
+                  {...register('email')}
+                  placeholder={t('cta.emailPlaceholder')}
+                  className="w-full rounded-xl bg-white/10 px-4 py-3.5 text-sm text-white placeholder:text-white/40 border border-white/20 outline-none focus:border-accent"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-[11px] font-bold text-sale text-left">{t('auth.errorInvalidEmail')}</p>
+                )}
+              </div>
               <button
                 type="submit"
-                className="rounded-xl bg-accent px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-ink transition-all hover:bg-accent/90 active:scale-95 shrink-0"
+                disabled={isSubmitting}
+                className="rounded-xl bg-accent px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-ink transition-all hover:bg-accent/90 active:scale-95 shrink-0 disabled:opacity-50"
               >
-                {t('cta.subscribe')}
+                {isSubmitting ? t('cta.submitting') : t('cta.subscribe')}
               </button>
             </form>
+          )}
+
+          {error && (
+            <p className="mt-3 text-xs font-bold text-sale">{error}</p>
           )}
 
           <p className="mt-4 text-[11px] text-white/40">

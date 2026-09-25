@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const newsletterSchema = z.object({
-  email: z.string().email('Por favor, insira um e-mail válido'),
+  email: z.string().email(),
 });
 
 export type NewsletterFormData = z.infer<typeof newsletterSchema>;

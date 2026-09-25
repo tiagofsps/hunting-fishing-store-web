@@ -1,6 +1,6 @@
-import type { Brand } from '../types';
-import { formatImageUrl } from '../utils';
-import { useLanguage } from '../../../i18n/LanguageContext';
+import type { Brand } from '../../../types';
+import { formatImageUrl } from '../../../utils';
+import { useLanguage } from '../../../i18n/useLanguage';
 
 interface BrandSectionProps {
   brands: Brand[];

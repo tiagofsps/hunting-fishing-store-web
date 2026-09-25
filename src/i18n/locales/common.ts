@@ -25,11 +25,22 @@ export const commonTranslations = {
     'footer.supportHeading': 'Customer Support',
     'footer.locationHeading': 'Our Location',
     'footer.rights': 'All rights reserved.',
+    'footer.terms': 'Terms & Conditions',
+    'footer.privacy': 'Privacy Policy',
+    'footer.licensing': 'Licensing & Legislation',
+    'footer.returns': 'Returns & Exchanges',
+    'footer.facebook': 'Facebook',
+    'footer.instagram': 'Instagram',
+    'footer.youtube': 'YouTube',
 
     // Common
     'common.retry': 'Try Again',
     'common.loading': 'Loading catalog data...',
     'common.errorTitle': 'Error loading catalog data:',
+    'common.backendError': 'Verify backend API connection at http://localhost:8080',
+    'common.close': 'Close',
+    'common.errorBoundaryTitle': 'Something went wrong',
+    'common.errorBoundaryDesc': 'An unexpected error occurred. Please reload the page to continue.',
   },
   pt: {
     // Navigation
@@ -57,10 +68,21 @@ export const commonTranslations = {
     'footer.supportHeading': 'Apoio ao Cliente',
     'footer.locationHeading': 'Onde Estamos',
     'footer.rights': 'Todos os direitos reservados.',
+    'footer.terms': 'Termos & Condições',
+    'footer.privacy': 'Política de Privacidade',
+    'footer.licensing': 'Licenciamento & Legislação',
+    'footer.returns': 'Trocas & Devoluções',
+    'footer.facebook': 'Facebook',
+    'footer.instagram': 'Instagram',
+    'footer.youtube': 'YouTube',
 
     // Common
     'common.retry': 'Tentar novamente',
     'common.loading': 'A carregar produtos e categorias do catálogo...',
     'common.errorTitle': 'Erro ao carregar dados:',
+    'common.backendError': 'Verifica a ligação à API do backend em http://localhost:8080',
+    'common.close': 'Fechar',
+    'common.errorBoundaryTitle': 'Algo correu mal',
+    'common.errorBoundaryDesc': 'Ocorreu um erro inesperado. Recarrega a página para continuar.',
   },
 };
