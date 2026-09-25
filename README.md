@@ -1,75 +1,36 @@
-# React + TypeScript + Vite
+# Wild Life — Hunting & Fishing Store (Web Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Storefront SPA for the Hunting & Fishing Store: React 19 + TypeScript + Vite, Tailwind CSS v4, feature-driven architecture. The backend is a separate Spring Boot REST service.
 
-Currently, two official plugins are available:
+## Commands (pnpm only)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `pnpm dev` — Vite dev server; proxies `/api`, `/images`, `/brands`, `/uploads`, `/static` to `http://localhost:8080`
+- `pnpm build` — `tsc -b && vite build` (typecheck is part of build)
+- `pnpm lint` — `eslint .`
+- No test framework is configured; do not add or run tests.
 
-## React Compiler
+## Backend requirement
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The home page fetches `/api/v1/*` (products, categories, brands, promotions) on mount. Without a backend at `localhost:8080` the app renders an error state — a missing backend is not a frontend bug.
 
-## Expanding the ESLint configuration
+## Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Follow `docs/architecture/frontend-structure.md` for structure and conventions.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features must not import each other; wire them together via `App.tsx` props/callbacks.
+- Shared UI lives in `src/components/`. Use PascalCase filenames (`CartDrawer.tsx`) for new files.
+- Shared domain types live in `src/types.ts`; shared helpers in `src/utils.ts`; the authenticated fetch wrapper in `src/lib/apiClient.ts`.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Conventions / gotchas
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `tsconfig.app.json` sets `verbatimModuleSyntax`: type-only imports must use `import type`. `erasableSyntaxOnly`: no enums or namespaces — use union types / const objects.
+- All UI text goes through `useLanguage().t('feature.key')`. Each feature with UI text has a locale file `src/i18n/locales/<feature>.ts` exporting both `en` and `pt`, registered in `src/i18n/translations.ts`. No new hardcoded user-facing strings.
+- Forms use react-hook-form + zod (v4) + @hookform/resolvers. Schemas live in the feature's `validation.ts`, exporting the schema and its `z.infer` type suffixed `FormData`.
+- Tailwind v4 theme tokens are defined via `@theme` in `src/index.css`. Use the semantic tokens (`bg-surface`, `text-ink`, `border-accent-strong`, `text-sale`, …) instead of raw palette colors.
 
-```
+## Features
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+- **Home page** — catalog (products, categories, brands, promotions) fetched from `/api/v1`, search + category filtering, quick view modal, newsletter signup.
+- **Auth** — login / register / forgot password against `/api/v1/auth`, session restored from the access token, refresh handled by `apiClient`.
+- **Cart** — hybrid cart: localStorage for guests, best-effort server sync (`/api/v1/carts`) when logged in.
+- **Checkout** — requires login; address selection/creation, license verification for regulated items, payment initiation (MB WAY / Multibanco / Credit Card / Klarna) against `/api/v1/orders` and `/api/v1/payments`.
