@@ -74,15 +74,3 @@ export interface NewsletterSubscriptionResponse {
 }
 
 export type ProductPage = Page<ProductResponse>;
-
-// Temporary re-exports for legacy consumers (App, checkout) while they migrate
-// to `src/types`. Removed once those consumers are rewritten.
-export type {
-  ProductItem,
-  ProductImage,
-  Product,
-  Category,
-  Brand,
-  Promotion,
-  CartItem,
-} from '../../types';

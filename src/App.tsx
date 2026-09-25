@@ -10,73 +10,48 @@ import BrandSection from './features/home-page/components/BrandSection';
 import PromotionBanner from './features/home-page/components/PromotionBanner';
 import CTASection from './features/home-page/components/CTASection';
 import Footer from './components/footer';
+import AuthModal from './features/auth/components/AuthModal';
 import { useHomeData } from './features/home-page/hooks';
-import type { Product, ProductItem, CartItem } from './features/home-page/types';
-import { useLanguage } from './i18n/LanguageContext';
+import { useAuth } from './features/auth/hooks';
+import { useCart } from './features/cart/hooks';
+import type { Product, ProductItem } from './types';
+import { useLanguage } from './i18n/useLanguage';
 
 export default function App() {
   const { t } = useLanguage();
   const { products, categories, brands, promotions, loading, error } = useHomeData();
+  const { user, login, register, logout, updateUser } = useAuth();
+  const { cartItems, addToCart, updateQuantity, removeItem, clearCart, totalCount } = useCart(user?.id ?? null);
 
   // Interactive States
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Cart Actions
   const handleAddToCart = (product: Product, selectedItem?: ProductItem) => {
-    const sku = selectedItem?.sku;
-    setCartItems((prev) => {
-      const existingIdx = prev.findIndex(
-        (item) => item.product.id === product.id && item.selectedItem?.sku === sku
-      );
-      if (existingIdx > -1) {
-        const updated = [...prev];
-        updated[existingIdx].quantity += 1;
-        return updated;
-      }
-      return [...prev, { product, selectedItem, quantity: 1 }];
-    });
+    addToCart(product, selectedItem);
     setIsCartOpen(true);
   };
 
-  const handleUpdateQuantity = (productId: number, itemSku: string | undefined, delta: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.product.id === productId && item.selectedItem?.sku === itemSku) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null)
-    );
+  const handleOpenCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
   };
-
-  const handleRemoveItem = (productId: number, itemSku?: string) => {
-    setCartItems((prev) =>
-      prev.filter((item) => !(item.product.id === productId && item.selectedItem?.sku === itemSku))
-    );
-  };
-
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
-
-  const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-surface text-ink antialiased">
       <PromotionBanner promotions={promotions} />
       <Navbar
-        cartCount={totalCartCount}
+        cartCount={totalCount}
         onOpenCart={() => setIsCartOpen(true)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        currentUser={user}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onLogout={logout}
       />
 
       <main>
@@ -93,7 +68,7 @@ export default function App() {
           <div className="mx-auto max-w-xl px-5 py-24 text-center">
             <div className="rounded-3xl border border-sale/30 bg-sale/10 p-8">
               <p className="font-bold text-sale">{t('common.errorTitle')} {error}</p>
-              <p className="mt-2 text-xs text-muted">Verify backend API connection at http://localhost:8080</p>
+              <p className="mt-2 text-xs text-muted">{t('common.backendError')}</p>
               <button
                 onClick={() => window.location.reload()}
                 className="mt-6 rounded-xl bg-ink px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-ink/90"
@@ -103,7 +78,6 @@ export default function App() {
             </div>
           </div>
         ) : (
-
           <>
             <ProductSection
               products={products}
@@ -129,10 +103,10 @@ export default function App() {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onClearCart={handleClearCart}
-        onOpenCheckout={() => setIsCheckoutOpen(true)}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
+        onClearCart={clearCart}
+        onOpenCheckout={handleOpenCheckout}
       />
 
       {/* Quick View Modal */}
@@ -147,11 +121,22 @@ export default function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cartItems}
-        onOrderCompleted={handleClearCart}
+        currentUser={user}
+        onOrderCompleted={clearCart}
+        onRequireLogin={() => {
+          setIsCheckoutOpen(false);
+          setIsAuthOpen(true);
+        }}
+        onUserUpdated={updateUser}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onLogin={login}
+        onRegister={register}
       />
     </div>
   );
 }
-
-
-

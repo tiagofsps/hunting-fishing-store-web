@@ -1,38 +1,53 @@
-import type { CartItem } from '../home-page/types';
+import type { Address } from '../../types';
 
 export type PaymentMethod = 'mbway' | 'multibanco' | 'credit_card' | 'klarna';
 
-export interface ShippingAddress {
-  fullName: string;
-  email: string;
-  phone: string;
-  nif?: string;
-  street: string;
-  postalCode: string;
-  city: string;
-  country: string;
+export interface CheckoutRequest {
+  shippingAddressId: number;
+  billingAddressId?: number;
+  couponCode?: string;
 }
 
-export interface CheckoutFormData {
-  shipping: ShippingAddress;
-  licenseFile?: File | null;
-  paymentMethod: PaymentMethod;
-  cardNumber?: string;
-  cardExpiry?: string;
-  cardCvc?: string;
-  mbwayPhone?: string;
+export interface OrderItemResponse {
+  id: number;
+  productItemId: number;
+  productName: string;
+  sku: string;
+  quantity: number;
+  unitPrice: number;
+  subTotal: number;
+}
+
+export interface OrderResponse {
+  id: number;
+  orderNumber: string;
+  orderDate: string;
+  status: string;
+  subtotalAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  shippingCost: number;
+  userId: number;
+  shippingAddress: Address;
+  billingAddress: Address;
+  items: OrderItemResponse[];
+}
+
+export interface PaymentResponse {
+  id: number;
+  orderId: number;
+  amount: number;
+  paymentMethod: string;
+  status: string;
+  transactionId: string | null;
+  multibancoEntity: string | null;
+  multibancoReference: string | null;
+  mbwayPhone: string | null;
+  paymentUrl: string | null;
+  referenceExpiresAt: string | null;
 }
 
 export interface OrderResult {
-  orderId: string;
-  createdAt: string;
-  items: CartItem[];
-  subtotal: number;
-  shippingFee: number;
-  total: number;
-  shipping: ShippingAddress;
-  paymentMethod: PaymentMethod;
-  multibancoEntity?: string;
-  multibancoRef?: string;
-  mbwayPhone?: string;
+  order: OrderResponse;
+  payment: PaymentResponse;
 }

@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { useLanguage } from '../i18n/LanguageContext';
+import { useLanguage } from '../i18n/useLanguage';
 import { STORE_CONFIG } from '../config/store';
+import type { AuthUser } from '../types';
 
 type NavbarProps = {
   cartCount: number;
   onOpenCart: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  currentUser: AuthUser | null;
+  onOpenAuth: () => void;
+  onLogout: () => void;
 };
 
 export default function Navbar({
@@ -14,6 +18,9 @@ export default function Navbar({
   onOpenCart,
   searchQuery,
   onSearchChange,
+  currentUser,
+  onOpenAuth,
+  onLogout,
 }: NavbarProps) {
   const { language, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,6 +100,32 @@ export default function Navbar({
               PT
             </button>
           </div>
+
+          {/* Auth Button */}
+          {currentUser ? (
+            <div className="flex items-center gap-2 rounded-full border border-border bg-surface-raised p-1 text-xs">
+              <span className="pl-3 pr-1 font-black text-ink flex items-center gap-1.5">
+                <span className={`h-2 w-2 rounded-full ${currentUser.role === 'ADMIN' ? 'bg-sale' : 'bg-accent-strong'}`}></span>
+                {currentUser.firstName}
+              </span>
+              <button
+                onClick={onLogout}
+                className="rounded-full bg-ink/5 px-2.5 py-1.5 font-bold text-body hover:bg-sale hover:text-white transition-all uppercase tracking-wider text-[10px]"
+              >
+                {t('auth.logout')}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="flex h-10 items-center gap-2 rounded-full border border-border bg-surface-raised px-4 text-xs font-bold text-ink hover:bg-surface-hover transition-all"
+            >
+              <svg className="h-4 w-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>{t('auth.signIn')}</span>
+            </button>
+          )}
 
           {/* Cart Button */}
           <button

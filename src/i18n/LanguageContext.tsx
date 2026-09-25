@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { LanguageContext } from './languageContext';
 import { translations, type Language } from './translations';
 
-// Temporary re-export while consumers migrate to `./useLanguage`.
-export { useLanguage } from './useLanguage';
-
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('app_lang');
