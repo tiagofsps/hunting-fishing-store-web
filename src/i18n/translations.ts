@@ -3,6 +3,7 @@ import { homeTranslations } from './locales/home';
 import { shopTranslations } from './locales/shop';
 import { productDetailTranslations } from './locales/product-detail';
 import { ordersTranslations } from './locales/orders';
+import { accountTranslations } from './locales/account';
 import { cartTranslations } from './locales/cart';
 import { checkoutTranslations } from './locales/checkout';
 import { authTranslations } from './locales/auth';
@@ -16,6 +17,7 @@ export const translations: Record<Language, Record<string, string>> = {
     ...shopTranslations.en,
     ...productDetailTranslations.en,
     ...ordersTranslations.en,
+    ...accountTranslations.en,
     ...cartTranslations.en,
     ...checkoutTranslations.en,
     ...authTranslations.en,
@@ -26,6 +28,7 @@ export const translations: Record<Language, Record<string, string>> = {
     ...shopTranslations.pt,
     ...productDetailTranslations.pt,
     ...ordersTranslations.pt,
+    ...accountTranslations.pt,
     ...cartTranslations.pt,
     ...checkoutTranslations.pt,
     ...authTranslations.pt,

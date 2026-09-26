@@ -10,6 +10,7 @@ import CartPage from './features/cart/components/CartPage';
 import CheckoutPage from './features/checkout/components/CheckoutPage';
 import OrdersPage from './features/orders/components/OrdersPage';
 import OrderDetailPage from './features/orders/components/OrderDetailPage';
+import AccountPage from './features/account/components/AccountPage';
 
 export default function App() {
   return (
@@ -39,7 +40,7 @@ export default function App() {
           path="account"
           element={
             <RequireAuth>
-              <PlaceholderPage titleKey="common.placeholderAccount" />
+              <AccountPage />
             </RequireAuth>
           }
         />
