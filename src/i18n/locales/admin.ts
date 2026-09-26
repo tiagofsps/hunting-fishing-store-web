@@ -136,6 +136,25 @@ export const adminTranslations = {
     'admin.targetProduct': 'Product',
     'admin.globalPromotion': 'Global (no targets)',
 
+    // Newsletter
+    'admin.newsletterTitle': 'Newsletter',
+    'admin.newsletterSubtitle': 'Email subscriptions',
+    'admin.email': 'Email',
+    'admin.subscribedAt': 'Subscribed',
+    'admin.unsubscribe': 'Unsubscribe',
+    'admin.unsubscribeConfirm': 'Unsubscribe this address?',
+    'admin.noSubscriptions': 'No subscriptions yet.',
+
+    // Users
+    'admin.usersTitle': 'Users',
+    'admin.usersSubtitle': 'Registered customers and administrators',
+    'admin.usersReadOnlyNote': 'The backend does not expose role changes or account activation, so this list is read-only.',
+    'admin.role': 'Role',
+    'admin.roleAdmin': 'Administrator',
+    'admin.roleUser': 'Customer',
+    'admin.noUsers': 'No users yet.',
+
+
     // Generic
     'admin.saving': 'Saving...',
     'admin.errorTitle': 'Something went wrong:',
@@ -280,6 +299,25 @@ export const adminTranslations = {
     'admin.targetBrand': 'Marca',
     'admin.targetProduct': 'Produto',
     'admin.globalPromotion': 'Global (sem alvos)',
+
+    // Newsletter
+    'admin.newsletterTitle': 'Newsletter',
+    'admin.newsletterSubtitle': 'Subscrições de email',
+    'admin.email': 'Email',
+    'admin.subscribedAt': 'Subscrito',
+    'admin.unsubscribe': 'Cancelar subscrição',
+    'admin.unsubscribeConfirm': 'Cancelar a subscrição deste email?',
+    'admin.noSubscriptions': 'Ainda não há subscrições.',
+
+    // Users
+    'admin.usersTitle': 'Utilizadores',
+    'admin.usersSubtitle': 'Clientes registados e administradores',
+    'admin.usersReadOnlyNote': 'O backend não expõe alteração de roles nem ativação de contas, por isso esta lista é apenas de leitura.',
+    'admin.role': 'Role',
+    'admin.roleAdmin': 'Administrador',
+    'admin.roleUser': 'Cliente',
+    'admin.noUsers': 'Ainda não há utilizadores.',
+
 
     // Generic
     'admin.saving': 'A guardar...',

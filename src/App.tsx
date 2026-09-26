@@ -22,6 +22,8 @@ import AdminStockPage from './features/admin/components/AdminStockPage';
 import AdminOrdersPage from './features/admin/components/AdminOrdersPage';
 import AdminCouponsPage from './features/admin/components/AdminCouponsPage';
 import AdminPromotionsPage from './features/admin/components/AdminPromotionsPage';
+import AdminNewsletterPage from './features/admin/components/AdminNewsletterPage';
+import AdminUsersPage from './features/admin/components/AdminUsersPage';
 
 export default function App() {
   return (
@@ -89,6 +91,8 @@ export default function App() {
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="coupons" element={<AdminCouponsPage />} />
           <Route path="promotions" element={<AdminPromotionsPage />} />
+          <Route path="newsletter" element={<AdminNewsletterPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
           <Route path="*" element={<PlaceholderPage titleKey="common.placeholderDesc" />} />
         </Route>
         <Route path="*" element={<NotFound />} />

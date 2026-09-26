@@ -267,3 +267,42 @@ export async function createPromotion(payload: {
 export async function deletePromotion(id: number): Promise<void> {
   await apiFetch<void>(`${PROMOTIONS_URL}/${id}`, { method: 'DELETE' });
 }
+
+// ---------------------------------------------------------------------------
+// Newsletter and users
+// ---------------------------------------------------------------------------
+
+const NEWSLETTER_URL = '/api/v1/newsletter';
+
+export interface NewsletterSubscription {
+  id: number;
+  email: string;
+  active: boolean;
+  subscribedAt: string;
+}
+
+export async function listSubscriptions(page: number, size: number): Promise<Page<NewsletterSubscription>> {
+  return apiFetch<Page<NewsletterSubscription>>(`${NEWSLETTER_URL}/subscriptions?page=${page}&size=${size}`);
+}
+
+export async function unsubscribe(email: string): Promise<void> {
+  await apiFetch<void>(`${NEWSLETTER_URL}/subscribe`, {
+    method: 'DELETE',
+    body: JSON.stringify({ email }),
+  });
+}
+
+/**
+ * The user list is admin-only and returns full profiles. The backend exposes
+ * no role-change or enable/disable endpoint, so admins can only correct the
+ * profile fields that `PUT /users/{id}` accepts.
+ */
+export async function updateUserProfile(
+  userId: number,
+  payload: { firstName?: string; lastName?: string; phone?: string }
+): Promise<UserResponse> {
+  return apiFetch<UserResponse>(`${USERS_URL}/${userId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
