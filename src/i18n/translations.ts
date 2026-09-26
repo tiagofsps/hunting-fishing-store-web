@@ -1,6 +1,7 @@
 import { commonTranslations } from './locales/common';
 import { homeTranslations } from './locales/home';
 import { shopTranslations } from './locales/shop';
+import { productDetailTranslations } from './locales/product-detail';
 import { cartTranslations } from './locales/cart';
 import { checkoutTranslations } from './locales/checkout';
 import { authTranslations } from './locales/auth';
@@ -12,6 +13,7 @@ export const translations: Record<Language, Record<string, string>> = {
     ...commonTranslations.en,
     ...homeTranslations.en,
     ...shopTranslations.en,
+    ...productDetailTranslations.en,
     ...cartTranslations.en,
     ...checkoutTranslations.en,
     ...authTranslations.en,
@@ -20,6 +22,7 @@ export const translations: Record<Language, Record<string, string>> = {
     ...commonTranslations.pt,
     ...homeTranslations.pt,
     ...shopTranslations.pt,
+    ...productDetailTranslations.pt,
     ...cartTranslations.pt,
     ...checkoutTranslations.pt,
     ...authTranslations.pt,

@@ -4,6 +4,7 @@ import NotFound from './components/NotFound';
 import PlaceholderPage from './components/PlaceholderPage';
 import HomePage from './features/home-page/components/HomePage';
 import ShopPage from './features/catalog/components/ShopPage';
+import ProductDetailPage from './features/product-detail/components/ProductDetailPage';
 
 export default function App() {
   return (
@@ -11,7 +12,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="shop" element={<ShopPage />} />
-        <Route path="product/:id" element={<PlaceholderPage titleKey="common.placeholderProduct" />} />
+        <Route path="product/:id" element={<ProductDetailPage />} />
         <Route path="cart" element={<PlaceholderPage titleKey="common.placeholderCart" />} />
         <Route path="checkout" element={<PlaceholderPage titleKey="common.placeholderCheckout" />} />
         <Route path="order/:orderNumber" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />

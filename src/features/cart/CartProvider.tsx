@@ -67,20 +67,20 @@ export default function CartProvider({
     syncGuestCart();
   }, [userId]);
 
-  const addToCart = (product: Product, selectedItem?: ProductItem) => {
+  const addToCart = (product: Product, selectedItem?: ProductItem, quantity = 1) => {
     const sku = selectedItem?.sku;
     const existing = cartItems.find((i) => i.product.id === product.id && i.selectedItem?.sku === sku);
     if (userId !== null && selectedItem) {
-      api.addToCart(userId, selectedItem.id, 1).catch(() => {});
+      api.addToCart(userId, selectedItem.id, quantity).catch(() => {});
     }
     if (existing) {
       setCartItems((prev) =>
         prev.map((i) =>
-          i.product.id === product.id && i.selectedItem?.sku === sku ? { ...i, quantity: i.quantity + 1 } : i
+          i.product.id === product.id && i.selectedItem?.sku === sku ? { ...i, quantity: i.quantity + quantity } : i
         )
       );
     } else {
-      setCartItems((prev) => [...prev, { product, selectedItem, quantity: 1 }]);
+      setCartItems((prev) => [...prev, { product, selectedItem, quantity }]);
     }
   };
 
