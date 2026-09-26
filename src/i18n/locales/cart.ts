@@ -17,6 +17,11 @@ export const cartTranslations = {
     'cart.checkoutButton': 'Complete Order',
     'cart.clearCart': 'Empty Cart',
     'cart.close': 'Close cart',
+    'cart.viewCart': 'View full cart',
+    'cart.variant': 'Variant',
+    'cart.each': 'each',
+    'cart.loginToCheckout': 'Sign in to continue',
+    'cart.orderSummary': 'Order Summary',
   },
   pt: {
     'cart.title': 'O teu Cesto',
@@ -36,5 +41,10 @@ export const cartTranslations = {
     'cart.checkoutButton': 'Finalizar Encomenda',
     'cart.clearCart': 'Esvaziar Cesto',
     'cart.close': 'Fechar cesto',
+    'cart.viewCart': 'Ver o cesto completo',
+    'cart.variant': 'Variante',
+    'cart.each': 'cada',
+    'cart.loginToCheckout': 'Inicia sessão para continuar',
+    'cart.orderSummary': 'Resumo da Encomenda',
   },
 };

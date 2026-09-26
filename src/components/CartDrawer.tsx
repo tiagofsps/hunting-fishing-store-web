@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import type { CartItem } from '../types';
 import { formatCurrency, getProductImageUrl, getProductPrice } from '../utils';
 import { useLanguage } from '../i18n/useLanguage';
@@ -203,6 +204,14 @@ export default function CartDrawer({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
+
+              <Link
+                to="/cart"
+                onClick={onClose}
+                className="block w-full text-center text-[11px] font-bold uppercase tracking-wider text-muted hover:text-accent-strong transition-colors"
+              >
+                {t('cart.viewCart')}
+              </Link>
 
               <button
                 onClick={onClearCart}
