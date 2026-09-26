@@ -1,20 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import type { Product, ProductItem } from '../types';
 import { OverlayContext } from './overlay-context';
 import CartDrawer from './CartDrawer';
 import QuickViewModal from '../features/home-page/components/QuickViewModal';
-import CheckoutModal from '../features/checkout/components/CheckoutModal';
 import AuthModal from '../features/auth/components/AuthModal';
 import { useCart } from '../features/cart/hooks';
 import { useAuth } from '../features/auth/hooks';
 
 export default function OverlayProvider({ children }: { children: React.ReactNode }) {
   const { cartItems, addToCart, updateQuantity, removeItem, clearCart } = useCart();
-  const { user, login, register, updateUser } = useAuth();
+  const { user, login, register } = useAuth();
+  const navigate = useNavigate();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   const handleAddToCart = (product: Product, selectedItem?: ProductItem) => {
@@ -24,7 +24,8 @@ export default function OverlayProvider({ children }: { children: React.ReactNod
 
   const handleOpenCheckout = () => {
     setIsCartOpen(false);
-    setIsCheckoutOpen(true);
+    if (user) navigate('/checkout');
+    else setIsAuthOpen(true);
   };
 
   return (
@@ -36,9 +37,6 @@ export default function OverlayProvider({ children }: { children: React.ReactNod
         isAuthOpen,
         openAuth: () => setIsAuthOpen(true),
         closeAuth: () => setIsAuthOpen(false),
-        isCheckoutOpen,
-        openCheckout: () => setIsCheckoutOpen(true),
-        closeCheckout: () => setIsCheckoutOpen(false),
         quickViewProduct,
         openQuickView: setQuickViewProduct,
         closeQuickView: () => setQuickViewProduct(null),
@@ -60,19 +58,6 @@ export default function OverlayProvider({ children }: { children: React.ReactNod
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
         onAddToCart={handleAddToCart}
-      />
-
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cartItems={cartItems}
-        currentUser={user}
-        onOrderCompleted={clearCart}
-        onRequireLogin={() => {
-          setIsCheckoutOpen(false);
-          setIsAuthOpen(true);
-        }}
-        onUserUpdated={updateUser}
       />
 
       <AuthModal

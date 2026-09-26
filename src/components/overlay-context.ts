@@ -8,9 +8,6 @@ export interface OverlayContextValue {
   isAuthOpen: boolean;
   openAuth: () => void;
   closeAuth: () => void;
-  isCheckoutOpen: boolean;
-  openCheckout: () => void;
-  closeCheckout: () => void;
   quickViewProduct: Product | null;
   openQuickView: (product: Product) => void;
   closeQuickView: () => void;

@@ -2,10 +2,12 @@ import { Routes, Route } from 'react-router';
 import Layout from './components/Layout';
 import NotFound from './components/NotFound';
 import PlaceholderPage from './components/PlaceholderPage';
+import RequireAuth from './components/RequireAuth';
 import HomePage from './features/home-page/components/HomePage';
 import ShopPage from './features/catalog/components/ShopPage';
 import ProductDetailPage from './features/product-detail/components/ProductDetailPage';
 import CartPage from './features/cart/components/CartPage';
+import CheckoutPage from './features/checkout/components/CheckoutPage';
 
 export default function App() {
   return (
@@ -15,7 +17,14 @@ export default function App() {
         <Route path="shop" element={<ShopPage />} />
         <Route path="product/:id" element={<ProductDetailPage />} />
         <Route path="cart" element={<CartPage />} />
-        <Route path="checkout" element={<PlaceholderPage titleKey="common.placeholderCheckout" />} />
+        <Route
+          path="checkout"
+          element={
+            <RequireAuth>
+              <CheckoutPage />
+            </RequireAuth>
+          }
+        />
         <Route path="order/:orderNumber" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />
         <Route path="account" element={<PlaceholderPage titleKey="common.placeholderAccount" />} />
         <Route path="account/orders" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />
