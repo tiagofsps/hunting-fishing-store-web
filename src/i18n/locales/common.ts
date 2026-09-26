@@ -10,6 +10,10 @@ export const commonTranslations = {
     'nav.cart': 'Cart',
     'nav.openMenu': 'Open menu',
     'nav.closeMenu': 'Close menu',
+    'nav.shop': 'Shop',
+    'nav.account': 'My Account',
+    'nav.myOrders': 'My Orders',
+    'nav.admin': 'Admin',
 
     // Promotion Banner
     'promo.badge': 'Special Offer',
@@ -41,6 +45,18 @@ export const commonTranslations = {
     'common.close': 'Close',
     'common.errorBoundaryTitle': 'Something went wrong',
     'common.errorBoundaryDesc': 'An unexpected error occurred. Please reload the page to continue.',
+    'common.back': 'Back',
+    'common.goHome': 'Go to Homepage',
+    'common.notFoundTitle': 'Page not found',
+    'common.notFoundDesc': 'The page you are looking for does not exist or has been moved.',
+    'common.placeholderDesc': 'This section is under construction and will be available soon.',
+    'common.placeholderShop': 'Shop',
+    'common.placeholderProduct': 'Product Details',
+    'common.placeholderCart': 'Shopping Cart',
+    'common.placeholderCheckout': 'Checkout',
+    'common.placeholderOrders': 'My Orders',
+    'common.placeholderAccount': 'My Account',
+    'common.placeholderAdmin': 'Admin Console',
   },
   pt: {
     // Navigation
@@ -53,6 +69,10 @@ export const commonTranslations = {
     'nav.cart': 'Cesto',
     'nav.openMenu': 'Abrir menu',
     'nav.closeMenu': 'Fechar menu',
+    'nav.shop': 'Loja',
+    'nav.account': 'A Minha Conta',
+    'nav.myOrders': 'As Minhas Encomendas',
+    'nav.admin': 'Admin',
 
     // Promotion Banner
     'promo.badge': 'Oferta Especial',
@@ -84,5 +104,17 @@ export const commonTranslations = {
     'common.close': 'Fechar',
     'common.errorBoundaryTitle': 'Algo correu mal',
     'common.errorBoundaryDesc': 'Ocorreu um erro inesperado. Recarrega a página para continuar.',
+    'common.back': 'Voltar',
+    'common.goHome': 'Ir para a página inicial',
+    'common.notFoundTitle': 'Página não encontrada',
+    'common.notFoundDesc': 'A página que procuras não existe ou foi movida.',
+    'common.placeholderDesc': 'Esta secção está em construção e estará disponível em breve.',
+    'common.placeholderShop': 'Loja',
+    'common.placeholderProduct': 'Detalhes do Produto',
+    'common.placeholderCart': 'Cesto de Compras',
+    'common.placeholderCheckout': 'Checkout',
+    'common.placeholderOrders': 'As Minhas Encomendas',
+    'common.placeholderAccount': 'A Minha Conta',
+    'common.placeholderAdmin': 'Consola de Administração',
   },
 };

@@ -1,68 +1,62 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { useLanguage } from '../i18n/useLanguage';
 import { STORE_CONFIG } from '../config/store';
-import type { AuthUser } from '../types';
+import { useCart } from '../features/cart/hooks';
+import { useAuth } from '../features/auth/hooks';
+import { useOverlays } from './overlay-context';
 
-type NavbarProps = {
-  cartCount: number;
-  onOpenCart: () => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  currentUser: AuthUser | null;
-  onOpenAuth: () => void;
-  onLogout: () => void;
-};
-
-export default function Navbar({
-  cartCount,
-  onOpenCart,
-  searchQuery,
-  onSearchChange,
-  currentUser,
-  onOpenAuth,
-  onLogout,
-}: NavbarProps) {
+export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
+  const { totalCount } = useCart();
+  const { user, logout } = useAuth();
+  const { openCartDrawer, openAuth } = useOverlays();
+  const navigate = useNavigate();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const navigation = [
-    { name: t('nav.home'), href: '#home' },
-    { name: t('nav.categories'), href: '#categories' },
-    { name: t('nav.featured'), href: '#featured' },
-    { name: t('nav.brands'), href: '#brands' },
-    { name: t('nav.advantages'), href: '#advantages' },
+    { name: t('nav.home'), to: '/' },
+    { name: t('nav.shop'), to: '/shop' },
+    ...(user
+      ? [
+          { name: t('nav.myOrders'), to: '/account/orders' },
+          { name: t('nav.account'), to: '/account' },
+        ]
+      : []),
+    ...(user?.role === 'ADMIN' ? [{ name: t('nav.admin'), to: '/admin' }] : []),
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const productEl = document.getElementById('featured');
-    if (productEl) {
-      productEl.scrollIntoView({ behavior: 'smooth' });
-    }
+    const query = searchQuery.trim();
+    setIsMenuOpen(false);
+    navigate(query ? `/shop?q=${encodeURIComponent(query)}` : '/shop');
   };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md transition-all">
       <div className="mx-auto flex h-[100px] max-w-7xl items-center gap-6 px-5 sm:px-8 lg:px-10">
         {/* Brand Logo */}
-        <a href="#home" className="flex shrink-0 items-center gap-3 text-ink group" aria-label={STORE_CONFIG.name}>
+        <Link to="/" className="flex shrink-0 items-center gap-3 text-ink group" aria-label={STORE_CONFIG.name}>
           <img src="/logo.png" alt={STORE_CONFIG.name} className="h-20 group-hover:scale-105 transition-transform" />
           <div className="flex flex-col">
             <span className="text-[15px] font-black uppercase tracking-[0.18em] text-ink leading-tight">{STORE_CONFIG.name}</span>
             <span className="text-[10px] font-bold tracking-widest text-accent-strong uppercase">{STORE_CONFIG.shortDescription}</span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-7 lg:flex ml-4" aria-label="Main navigation">
           {navigation.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
+            <Link
+              key={item.to}
+              to={item.to}
               className="text-[13px] font-bold tracking-wide text-body transition-colors hover:text-accent-strong"
             >
               {item.name}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -75,7 +69,7 @@ export default function Navbar({
             <input
               type="search"
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('nav.searchPlaceholder')}
               className="min-w-0 flex-1 bg-transparent text-xs font-medium text-ink outline-none placeholder:text-placeholder"
             />
@@ -102,14 +96,14 @@ export default function Navbar({
           </div>
 
           {/* Auth Button */}
-          {currentUser ? (
+          {user ? (
             <div className="flex items-center gap-2 rounded-full border border-border bg-surface-raised p-1 text-xs">
               <span className="pl-3 pr-1 font-black text-ink flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${currentUser.role === 'ADMIN' ? 'bg-sale' : 'bg-accent-strong'}`}></span>
-                {currentUser.firstName}
+                <span className={`h-2 w-2 rounded-full ${user.role === 'ADMIN' ? 'bg-sale' : 'bg-accent-strong'}`}></span>
+                {user.firstName}
               </span>
               <button
-                onClick={onLogout}
+                onClick={() => logout()}
                 className="rounded-full bg-ink/5 px-2.5 py-1.5 font-bold text-body hover:bg-sale hover:text-white transition-all uppercase tracking-wider text-[10px]"
               >
                 {t('auth.logout')}
@@ -117,7 +111,7 @@ export default function Navbar({
             </div>
           ) : (
             <button
-              onClick={onOpenAuth}
+              onClick={openAuth}
               className="flex h-10 items-center gap-2 rounded-full border border-border bg-surface-raised px-4 text-xs font-bold text-ink hover:bg-surface-hover transition-all"
             >
               <svg className="h-4 w-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -130,16 +124,16 @@ export default function Navbar({
           {/* Cart Button */}
           <button
             type="button"
-            onClick={onOpenCart}
+            onClick={openCartDrawer}
             className="relative flex h-10 items-center gap-2.5 rounded-full bg-ink px-4 text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95"
-            aria-label={`${t('nav.cart')}, ${cartCount} ${t('cart.itemPlural')}`}
+            aria-label={`${t('nav.cart')}, ${totalCount} ${t('cart.itemPlural')}`}
           >
             <svg className="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             <span className="text-xs font-bold">{t('nav.cart')}</span>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[10px] font-black text-ink">
-              {cartCount}
+              {totalCount}
             </span>
           </button>
 
@@ -173,21 +167,21 @@ export default function Navbar({
             <input
               type="search"
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('nav.searchPlaceholder')}
               className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-placeholder"
             />
           </form>
           <nav className="grid gap-1" aria-label="Mobile navigation">
             {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
+              <Link
+                key={item.to}
+                to={item.to}
                 onClick={() => setIsMenuOpen(false)}
                 className="rounded-xl px-4 py-3 text-sm font-bold text-body hover:bg-surface-hover hover:text-accent-strong transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useLanguage } from "../i18n/useLanguage";
 import { STORE_CONFIG } from "../config/store";
 
@@ -41,44 +42,20 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 font-medium">
               <li>
-                <a
-                  href="#home"
+                <Link
+                  to="/"
                   className="hover:text-accent-strong transition-colors"
                 >
                   {t("nav.home")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#categories"
+                <Link
+                  to="/shop"
                   className="hover:text-accent-strong transition-colors"
                 >
-                  {t("nav.categories")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#featured"
-                  className="hover:text-accent-strong transition-colors"
-                >
-                  {t("nav.featured")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#brands"
-                  className="hover:text-accent-strong transition-colors"
-                >
-                  {t("nav.brands")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#advantages"
-                  className="hover:text-accent-strong transition-colors"
-                >
-                  {t("nav.advantages")}
-                </a>
+                  {t("nav.shop")}
+                </Link>
               </li>
             </ul>
           </div>

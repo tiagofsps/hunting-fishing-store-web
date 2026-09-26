@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Promotion } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import * as api from '../api';
 
-interface PromotionBannerProps {
-  promotions: Promotion[];
-}
-
-export default function PromotionBanner({ promotions }: PromotionBannerProps) {
+export default function PromotionBanner() {
   const { t } = useLanguage();
   const [dismissed, setDismissed] = useState(false);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getPromotions()
+      .then((data) => {
+        if (!cancelled) setPromotions(data);
+      })
+      .catch(() => {
+        // banner is decorative; ignore fetch errors
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (dismissed) return null;
 
@@ -41,5 +54,3 @@ export default function PromotionBanner({ promotions }: PromotionBannerProps) {
     </div>
   );
 }
-
-
