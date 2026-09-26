@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Promotion } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
-import * as api from '../api';
+import * as catalogApi from '../../../lib/catalogApi';
 
 export default function PromotionBanner() {
   const { t } = useLanguage();
@@ -10,7 +10,7 @@ export default function PromotionBanner() {
 
   useEffect(() => {
     let cancelled = false;
-    api
+    catalogApi
       .getPromotions()
       .then((data) => {
         if (!cancelled) setPromotions(data);

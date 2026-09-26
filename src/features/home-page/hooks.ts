@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import * as api from './api';
+import * as catalogApi from '../../lib/catalogApi';
 import type { Product, Category, Brand, Promotion } from '../../types';
 
 export function useHomeData() {
@@ -15,12 +15,12 @@ export function useHomeData() {
       try {
         setLoading(true);
         const [p, c, b, prom] = await Promise.all([
-          api.getProducts({ size: 20 }),
-          api.getCategories(),
-          api.getBrands(),
-          api.getPromotions(),
+          catalogApi.getProductsPage({ size: 20 }),
+          catalogApi.getCategories(),
+          catalogApi.getBrands(),
+          catalogApi.getPromotions(),
         ]);
-        setProducts(p);
+        setProducts(p.content);
         setCategories(c);
         setBrands(b);
         setPromotions(prom);

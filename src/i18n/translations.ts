@@ -1,5 +1,6 @@
 import { commonTranslations } from './locales/common';
 import { homeTranslations } from './locales/home';
+import { shopTranslations } from './locales/shop';
 import { cartTranslations } from './locales/cart';
 import { checkoutTranslations } from './locales/checkout';
 import { authTranslations } from './locales/auth';
@@ -10,6 +11,7 @@ export const translations: Record<Language, Record<string, string>> = {
   en: {
     ...commonTranslations.en,
     ...homeTranslations.en,
+    ...shopTranslations.en,
     ...cartTranslations.en,
     ...checkoutTranslations.en,
     ...authTranslations.en,
@@ -17,6 +19,7 @@ export const translations: Record<Language, Record<string, string>> = {
   pt: {
     ...commonTranslations.pt,
     ...homeTranslations.pt,
+    ...shopTranslations.pt,
     ...cartTranslations.pt,
     ...checkoutTranslations.pt,
     ...authTranslations.pt,
