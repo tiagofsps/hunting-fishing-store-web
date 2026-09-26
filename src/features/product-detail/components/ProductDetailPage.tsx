@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { useCart } from '../../cart/hooks';
 import { useOverlays } from '../../../components/overlay-context';
 import { useProductDetail } from '../hooks';
-import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency, getSalePrice, getSalePercentage } from '../../../utils';
+import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency, getSalePrice, getSalePercentage, formatImageUrl } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 export default function ProductDetailPage() {
@@ -55,7 +55,12 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product.images && product.images.length > 0 ? product.images.map((img) => img.imageUrl) : [getProductImageUrl(product)];
+  // Route every image through formatImageUrl so backend-hosted assets use the
+  // dev proxy, matching ProductCard and the shop grid.
+  const images =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => formatImageUrl(img.imageUrl) ?? getProductImageUrl(product))
+      : [getProductImageUrl(product)];
   const activeImageIndex = Math.min(selectedImageIndex, Math.max(images.length - 1, 0));
   const displayPrice = selectedItem ? selectedItem.price : getProductPrice(product);
   const displayStock = selectedItem ? selectedItem.stockQuantity : getProductStock(product);

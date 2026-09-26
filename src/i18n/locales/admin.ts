@@ -155,6 +155,8 @@ export const adminTranslations = {
     'admin.noUsers': 'No users yet.',
 
 
+    'admin.phone': 'Phone',
+    'admin.addressType': 'Addresses',
     // Generic
     'admin.saving': 'Saving...',
     'admin.errorTitle': 'Something went wrong:',
@@ -313,11 +315,12 @@ export const adminTranslations = {
     'admin.usersTitle': 'Utilizadores',
     'admin.usersSubtitle': 'Clientes registados e administradores',
     'admin.usersReadOnlyNote': 'O backend não expõe alteração de roles nem ativação de contas, por isso esta lista é apenas de leitura.',
+    'admin.phone': 'Telefone',
+    'admin.addressType': 'Moradas',
     'admin.role': 'Role',
     'admin.roleAdmin': 'Administrador',
     'admin.roleUser': 'Cliente',
     'admin.noUsers': 'Ainda não há utilizadores.',
-
 
     // Generic
     'admin.saving': 'A guardar...',

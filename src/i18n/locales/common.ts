@@ -49,14 +49,6 @@ export const commonTranslations = {
     'common.goHome': 'Go to Homepage',
     'common.notFoundTitle': 'Page not found',
     'common.notFoundDesc': 'The page you are looking for does not exist or has been moved.',
-    'common.placeholderDesc': 'This section is under construction and will be available soon.',
-    'common.placeholderShop': 'Shop',
-    'common.placeholderProduct': 'Product Details',
-    'common.placeholderCart': 'Shopping Cart',
-    'common.placeholderCheckout': 'Checkout',
-    'common.placeholderOrders': 'My Orders',
-    'common.placeholderAccount': 'My Account',
-    'common.placeholderAdmin': 'Admin Console',
   },
   pt: {
     // Navigation
@@ -108,13 +100,5 @@ export const commonTranslations = {
     'common.goHome': 'Ir para a página inicial',
     'common.notFoundTitle': 'Página não encontrada',
     'common.notFoundDesc': 'A página que procuras não existe ou foi movida.',
-    'common.placeholderDesc': 'Esta secção está em construção e estará disponível em breve.',
-    'common.placeholderShop': 'Loja',
-    'common.placeholderProduct': 'Detalhes do Produto',
-    'common.placeholderCart': 'Cesto de Compras',
-    'common.placeholderCheckout': 'Checkout',
-    'common.placeholderOrders': 'As Minhas Encomendas',
-    'common.placeholderAccount': 'A Minha Conta',
-    'common.placeholderAdmin': 'Consola de Administração',
   },
 };
