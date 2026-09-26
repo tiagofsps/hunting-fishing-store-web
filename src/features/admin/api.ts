@@ -100,3 +100,78 @@ export async function updateOrderStatus(orderNumber: string, status: OrderStatus
     `${ORDERS_URL}/${encodeURIComponent(orderNumber)}?status=${status}`
   );
 }
+
+// ---------------------------------------------------------------------------
+// Categories, brands and stock
+// ---------------------------------------------------------------------------
+
+const CATEGORIES_URL = '/api/v1/categories';
+const BRANDS_URL = '/api/v1/brands';
+const STOCK_URL = '/api/v1/stock-movements';
+
+export type MovementType = 'PURCHASE' | 'SALE' | 'RETURN' | 'ADJUSTMENT';
+
+export interface AdminCategoryPayload {
+  name: string;
+  slug: string;
+  description?: string;
+  parentCategoryId?: number;
+}
+
+export interface AdminBrandPayload {
+  name: string;
+  slug: string;
+  logoUrl?: string;
+}
+
+export interface StockMovement {
+  id: number;
+  productItemId: number;
+  sku: string;
+  quantity: number;
+  type: MovementType;
+  notes?: string;
+  userId?: number;
+  createdAt: string;
+}
+
+export async function createCategory(payload: AdminCategoryPayload): Promise<void> {
+  await apiFetch(CATEGORIES_URL, { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function updateCategory(id: number, payload: AdminCategoryPayload): Promise<void> {
+  await apiFetch(`${CATEGORIES_URL}/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+}
+
+export async function deleteCategory(id: number): Promise<void> {
+  await apiFetch<void>(`${CATEGORIES_URL}/${id}`, { method: 'DELETE' });
+}
+
+export async function createBrand(payload: AdminBrandPayload): Promise<void> {
+  await apiFetch(BRANDS_URL, { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function updateBrand(id: number, payload: AdminBrandPayload): Promise<void> {
+  await apiFetch(`${BRANDS_URL}/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+}
+
+export async function deleteBrand(id: number): Promise<void> {
+  await apiFetch<void>(`${BRANDS_URL}/${id}`, { method: 'DELETE' });
+}
+
+export async function createStockMovement(payload: {
+  productItemId: number;
+  quantity: number;
+  type: MovementType;
+  notes?: string;
+  userId?: number;
+}): Promise<StockMovement> {
+  return apiFetch<StockMovement>(STOCK_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listStockMovements(productItemId: number): Promise<StockMovement[]> {
+  return apiFetch<StockMovement[]>(`${STOCK_URL}/item/${productItemId}`);
+}

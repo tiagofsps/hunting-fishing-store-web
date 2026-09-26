@@ -40,3 +40,40 @@ export const adminProductSchema = z
     path: ['licenseType'],
   });
 export type AdminProductFormData = z.infer<typeof adminProductSchema>;
+
+// ---------------------------------------------------------------- categories
+
+export const adminCategorySchema = z.object({
+  name: z.string().min(1).max(100),
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'slugInvalid'),
+  description: z.string().max(500).optional(),
+  parentCategoryId: z.number().int().positive().optional(),
+});
+export type AdminCategoryFormData = z.infer<typeof adminCategorySchema>;
+
+// ------------------------------------------------------------------- brands
+
+export const adminBrandSchema = z.object({
+  name: z.string().min(1).max(100),
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'slugInvalid'),
+  logoUrl: z.string().max(500).optional(),
+});
+export type AdminBrandFormData = z.infer<typeof adminBrandSchema>;
+
+// -------------------------------------------------------------------- stock
+
+export const stockMovementSchema = z.object({
+  productItemId: z.number().int().positive(),
+  quantity: z.number().int().refine((value) => value !== 0, { message: 'quantityRequired' }),
+  type: z.enum(['PURCHASE', 'SALE', 'RETURN', 'ADJUSTMENT']),
+  notes: z.string().optional(),
+});
+export type StockMovementFormData = z.infer<typeof stockMovementSchema>;
