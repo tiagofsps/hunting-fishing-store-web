@@ -63,6 +63,7 @@ export function formatCurrency(amount: number, locale = 'pt-PT'): string {
 }
 
 function isPromotionActive(promotion: Promotion, now: Date): boolean {
+  if (promotion.active === false) return false;
   if (promotion.discountPercentage <= 0) return false;
   if (promotion.startDate && new Date(promotion.startDate) > now) return false;
   if (promotion.endDate && new Date(promotion.endDate) < now) return false;
@@ -79,18 +80,29 @@ export function getApplicablePromotion(product: Product, promotions: Promotion[]
   const active = promotions.filter((p) => isPromotionActive(p, now));
   if (active.length === 0) return null;
 
-  const direct = active.find((p) => p.rules?.some((r) => r.targetType === 'PRODUCT' && r.targetId === product.id));
+  const bestOf = (candidates: Promotion[]): Promotion | null =>
+    candidates.length === 0
+      ? null
+      : candidates.reduce((best, current) =>
+          current.discountPercentage > best.discountPercentage ? current : best
+        );
+
+  const direct = bestOf(
+    active.filter((p) => p.rules?.some((r) => r.targetType === 'PRODUCT' && r.targetId === product.id))
+  );
   if (direct) return direct;
 
-  const byCategory = active.find((p) =>
-    p.rules?.some((r) => r.targetType === 'CATEGORY' && r.targetId === product.categoryId)
+  const byCategory = bestOf(
+    active.filter((p) => p.rules?.some((r) => r.targetType === 'CATEGORY' && r.targetId === product.categoryId))
   );
   if (byCategory) return byCategory;
 
-  const byBrand = active.find((p) => p.rules?.some((r) => r.targetType === 'BRAND' && r.targetId === product.brandId));
+  const byBrand = bestOf(
+    active.filter((p) => p.rules?.some((r) => r.targetType === 'BRAND' && r.targetId === product.brandId))
+  );
   if (byBrand) return byBrand;
 
-  return active.find((p) => !p.rules || p.rules.length === 0) ?? null;
+  return bestOf(active.filter((p) => !p.rules || p.rules.length === 0));
 }
 
 export function getSalePercentage(product: Product, promotions: Promotion[]): number {

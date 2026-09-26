@@ -77,3 +77,41 @@ export const stockMovementSchema = z.object({
   notes: z.string().optional(),
 });
 export type StockMovementFormData = z.infer<typeof stockMovementSchema>;
+
+// ------------------------------------------------------------------ coupons
+
+export const adminCouponSchema = z.object({
+  code: z.string().min(1),
+  discountType: z.enum(['PERCENTAGE', 'FIXED_AMOUNT']),
+  discountValue: z.number().positive(),
+  minOrderAmount: z.number().positive().optional(),
+  usageLimit: z.number().int().positive().optional(),
+  usageLimitPerUser: z.number().int().positive().optional(),
+  validFrom: z.string().min(1),
+  validTo: z.string().min(1),
+});
+export type AdminCouponFormData = z.infer<typeof adminCouponSchema>;
+
+// --------------------------------------------------------------- promotions
+
+export const adminPromotionSchema = z
+  .object({
+    name: z.string().min(1),
+    discountType: z.enum(['PERCENTAGE', 'FIXED_AMOUNT']),
+    discountValue: z.number().positive(),
+    priority: z.number().int().optional(),
+    stackable: z.boolean(),
+    validFrom: z.string().min(1),
+    validTo: z.string().min(1),
+    rules: z.array(
+      z.object({
+        targetType: z.enum(['CATEGORY', 'BRAND', 'PRODUCT']),
+        targetId: z.number().int().positive(),
+      })
+    ),
+  })
+  .refine((data) => new Date(data.validTo) > new Date(data.validFrom), {
+    message: 'validRangeInvalid',
+    path: ['validTo'],
+  });
+export type AdminPromotionFormData = z.infer<typeof adminPromotionSchema>;

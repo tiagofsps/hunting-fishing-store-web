@@ -19,6 +19,9 @@ import AdminProductFormPage from './features/admin/components/AdminProductFormPa
 import AdminCategoriesPage from './features/admin/components/AdminCategoriesPage';
 import AdminBrandsPage from './features/admin/components/AdminBrandsPage';
 import AdminStockPage from './features/admin/components/AdminStockPage';
+import AdminOrdersPage from './features/admin/components/AdminOrdersPage';
+import AdminCouponsPage from './features/admin/components/AdminCouponsPage';
+import AdminPromotionsPage from './features/admin/components/AdminPromotionsPage';
 
 export default function App() {
   return (
@@ -83,6 +86,9 @@ export default function App() {
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="brands" element={<AdminBrandsPage />} />
           <Route path="stock" element={<AdminStockPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="coupons" element={<AdminCouponsPage />} />
+          <Route path="promotions" element={<AdminPromotionsPage />} />
           <Route path="*" element={<PlaceholderPage titleKey="common.placeholderDesc" />} />
         </Route>
         <Route path="*" element={<NotFound />} />

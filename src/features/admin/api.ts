@@ -175,3 +175,95 @@ export async function createStockMovement(payload: {
 export async function listStockMovements(productItemId: number): Promise<StockMovement[]> {
   return apiFetch<StockMovement[]>(`${STOCK_URL}/item/${productItemId}`);
 }
+
+// ---------------------------------------------------------------------------
+// Coupons and promotions
+//
+// The backend exposes coupons as create + read only (no PUT/DELETE), and
+// promotions have no PUT either, so promotion edits are done as delete+create.
+// ---------------------------------------------------------------------------
+
+const COUPONS_URL = '/api/v1/coupons';
+const PROMOTIONS_URL = '/api/v1/promotions';
+
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+export type PromotionTargetType = 'CATEGORY' | 'BRAND' | 'PRODUCT';
+
+export interface AdminCoupon {
+  id: number;
+  code: string;
+  discountType: DiscountType;
+  discountValue: number;
+  minOrderAmount: number | null;
+  usageLimit: number | null;
+  usageLimitPerUser: number | null;
+  validFrom: string;
+  validTo: string;
+  active: boolean;
+}
+
+export interface AdminPromotion {
+  id: number;
+  name: string;
+  discountType: DiscountType;
+  discountValue: number;
+  priority: number | null;
+  stackable: boolean;
+  validFrom: string;
+  validTo: string;
+  active: boolean;
+  rules: { id: number; targetType: PromotionTargetType; targetId: number }[];
+}
+
+/** Mirrors the backend ALLOWED_TRANSITIONS map. */
+export const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ['PAID', 'CANCELLED'],
+  PAID: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+export async function listCoupons(): Promise<AdminCoupon[]> {
+  return apiFetch<AdminCoupon[]>(COUPONS_URL);
+}
+
+export async function createCoupon(payload: {
+  code: string;
+  discountType: DiscountType;
+  discountValue: number;
+  minOrderAmount?: number;
+  usageLimit?: number;
+  usageLimitPerUser?: number;
+  validFrom: string;
+  validTo: string;
+}): Promise<AdminCoupon> {
+  return apiFetch<AdminCoupon>(COUPONS_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listPromotions(): Promise<AdminPromotion[]> {
+  return apiFetch<AdminPromotion[]>(PROMOTIONS_URL);
+}
+
+export async function createPromotion(payload: {
+  name: string;
+  discountType: DiscountType;
+  discountValue: number;
+  priority?: number;
+  stackable: boolean;
+  validFrom: string;
+  validTo: string;
+  rules: { targetType: PromotionTargetType; targetId: number }[];
+}): Promise<AdminPromotion> {
+  return apiFetch<AdminPromotion>(PROMOTIONS_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deletePromotion(id: number): Promise<void> {
+  await apiFetch<void>(`${PROMOTIONS_URL}/${id}`, { method: 'DELETE' });
+}

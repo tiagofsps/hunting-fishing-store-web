@@ -138,6 +138,7 @@ function mapPromotion(response: PromotionResponse): Promotion {
     title: response.name,
     description: '',
     discountPercentage: response.discountType === 'PERCENTAGE' ? response.discountValue : 0,
+    active: response.active,
     startDate: response.validFrom,
     endDate: response.validTo,
     rules: response.rules.map(

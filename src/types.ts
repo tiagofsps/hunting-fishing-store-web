@@ -61,6 +61,8 @@ export interface Promotion {
   title: string;
   description: string;
   discountPercentage: number;
+  /** Server-side flag. When false the promotion must never be applied. */
+  active?: boolean;
   startDate?: string;
   endDate?: string;
   rules?: PromotionRule[];
