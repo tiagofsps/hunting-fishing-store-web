@@ -1,5 +1,5 @@
 import { apiFetch } from '../../lib/apiClient';
-import type { Product, Category, Brand, Promotion } from '../../types';
+import type { Product, Category, Brand, Promotion, PromotionRule } from '../../types';
 import type {
   ProductPage,
   ProductResponse,
@@ -58,6 +58,10 @@ function mapPromotion(response: PromotionResponse): Promotion {
     discountPercentage: response.discountType === 'PERCENTAGE' ? response.discountValue : 0,
     startDate: response.validFrom,
     endDate: response.validTo,
+    rules: response.rules.map((rule) => ({
+      targetType: rule.targetType as PromotionRule['targetType'],
+      targetId: rule.targetId,
+    })),
   };
 }
 

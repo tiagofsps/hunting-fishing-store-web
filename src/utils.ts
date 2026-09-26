@@ -1,4 +1,4 @@
-import type { Product, UserResponse, AuthUser } from './types';
+import type { Product, Promotion, UserResponse, AuthUser } from './types';
 
 export function formatImageUrl(url: string | undefined): string | undefined {
   if (!url) return undefined;
@@ -60,6 +60,49 @@ export function formatCurrency(amount: number, locale = 'pt-PT'): string {
     style: 'currency',
     currency: 'EUR',
   }).format(amount);
+}
+
+function isPromotionActive(promotion: Promotion, now: Date): boolean {
+  if (promotion.discountPercentage <= 0) return false;
+  if (promotion.startDate && new Date(promotion.startDate) > now) return false;
+  if (promotion.endDate && new Date(promotion.endDate) < now) return false;
+  return true;
+}
+
+/**
+ * Returns the best applicable promotion for a product, preferring the most
+ * specific target: PRODUCT > CATEGORY > BRAND > global (no rules).
+ */
+export function getApplicablePromotion(product: Product, promotions: Promotion[]): Promotion | null {
+  if (!promotions || promotions.length === 0) return null;
+  const now = new Date();
+  const active = promotions.filter((p) => isPromotionActive(p, now));
+  if (active.length === 0) return null;
+
+  const direct = active.find((p) => p.rules?.some((r) => r.targetType === 'PRODUCT' && r.targetId === product.id));
+  if (direct) return direct;
+
+  const byCategory = active.find((p) =>
+    p.rules?.some((r) => r.targetType === 'CATEGORY' && r.targetId === product.categoryId)
+  );
+  if (byCategory) return byCategory;
+
+  const byBrand = active.find((p) => p.rules?.some((r) => r.targetType === 'BRAND' && r.targetId === product.brandId));
+  if (byBrand) return byBrand;
+
+  return active.find((p) => !p.rules || p.rules.length === 0) ?? null;
+}
+
+export function getSalePercentage(product: Product, promotions: Promotion[]): number {
+  const promotion = getApplicablePromotion(product, promotions);
+  return promotion ? promotion.discountPercentage : 0;
+}
+
+export function getSalePrice(product: Product, promotions: Promotion[]): number | null {
+  const promotion = getApplicablePromotion(product, promotions);
+  if (!promotion) return null;
+  const price = getProductPrice(product);
+  return Math.round(price * (1 - promotion.discountPercentage / 100) * 100) / 100;
 }
 
 export function toAuthUser(user: UserResponse): AuthUser {

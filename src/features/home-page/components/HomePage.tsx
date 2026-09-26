@@ -12,7 +12,7 @@ import { useLanguage } from '../../../i18n/useLanguage';
 
 export default function HomePage() {
   const { t } = useLanguage();
-  const { products, categories, brands, loading, error } = useHomeData();
+  const { products, categories, brands, promotions, loading, error } = useHomeData();
   const { addToCart } = useCart();
   const { openCartDrawer, openQuickView } = useOverlays();
 
@@ -52,6 +52,7 @@ export default function HomePage() {
           <ProductSection
             products={products}
             categories={categories}
+            promotions={promotions}
             selectedCategoryId={selectedCategoryId}
             onSelectCategory={setSelectedCategoryId}
             searchQuery=""

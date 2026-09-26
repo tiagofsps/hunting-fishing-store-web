@@ -51,6 +51,11 @@ export interface Brand {
   logoUrl?: string;
 }
 
+export interface PromotionRule {
+  targetType: 'CATEGORY' | 'BRAND' | 'PRODUCT';
+  targetId: number;
+}
+
 export interface Promotion {
   id: number;
   title: string;
@@ -58,6 +63,7 @@ export interface Promotion {
   discountPercentage: number;
   startDate?: string;
   endDate?: string;
+  rules?: PromotionRule[];
 }
 
 export interface CartItem {

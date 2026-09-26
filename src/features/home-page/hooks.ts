@@ -15,7 +15,7 @@ export function useHomeData() {
       try {
         setLoading(true);
         const [p, c, b, prom] = await Promise.all([
-          api.getProducts(),
+          api.getProducts({ size: 20 }),
           api.getCategories(),
           api.getBrands(),
           api.getPromotions(),

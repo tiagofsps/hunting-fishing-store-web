@@ -52,6 +52,8 @@ export const homeTranslations = {
     'prod.inStock': 'in stock',
     'prod.addToCart': 'Add to Cart',
     'prod.unavailable': 'Unavailable',
+    'prod.sale': '-{pct}%',
+    'prod.fallbackDescription': 'Pro gear for fishing and hunting with premium quality guarantee.',
 
     // Quick View Modal
     'modal.inStock': 'In Stock',
@@ -128,6 +130,8 @@ export const homeTranslations = {
     'prod.inStock': 'em stock',
     'prod.addToCart': 'Adicionar ao Cesto',
     'prod.unavailable': 'Indisponível',
+    'prod.sale': '-{pct}%',
+    'prod.fallbackDescription': 'Equipamento profissional para pesca e caça com garantia de qualidade premium.',
 
     // Quick View Modal
     'modal.inStock': 'Em Stock',
