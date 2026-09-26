@@ -8,6 +8,8 @@ import ShopPage from './features/catalog/components/ShopPage';
 import ProductDetailPage from './features/product-detail/components/ProductDetailPage';
 import CartPage from './features/cart/components/CartPage';
 import CheckoutPage from './features/checkout/components/CheckoutPage';
+import OrdersPage from './features/orders/components/OrdersPage';
+import OrderDetailPage from './features/orders/components/OrderDetailPage';
 
 export default function App() {
   return (
@@ -25,10 +27,38 @@ export default function App() {
             </RequireAuth>
           }
         />
-        <Route path="order/:orderNumber" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />
-        <Route path="account" element={<PlaceholderPage titleKey="common.placeholderAccount" />} />
-        <Route path="account/orders" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />
-        <Route path="account/orders/:orderNumber" element={<PlaceholderPage titleKey="common.placeholderOrders" />} />
+        <Route
+          path="order/:orderNumber"
+          element={
+            <RequireAuth>
+              <OrderDetailPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="account"
+          element={
+            <RequireAuth>
+              <PlaceholderPage titleKey="common.placeholderAccount" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="account/orders"
+          element={
+            <RequireAuth>
+              <OrdersPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="account/orders/:orderNumber"
+          element={
+            <RequireAuth>
+              <OrderDetailPage />
+            </RequireAuth>
+          }
+        />
         <Route path="admin/*" element={<PlaceholderPage titleKey="common.placeholderAdmin" />} />
         <Route path="*" element={<NotFound />} />
       </Route>

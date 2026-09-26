@@ -10,7 +10,8 @@ import { ApiError } from '../../../lib/apiClient';
 import { addressSchema, type AddressFormData } from '../validation';
 import * as api from '../api';
 import { useCheckout } from '../hooks';
-import type { PaymentMethod, OrderResult } from '../types';
+import type { PaymentMethod } from '../types';
+import type { OrderResult } from '../../../lib/ordersApi';
 
 /** Display-only estimate; the backend computes the authoritative order total. */
 const FREE_SHIPPING_THRESHOLD = 75;
@@ -420,12 +421,12 @@ export default function CheckoutPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {(
                     [
-                      ['mbway', 'MB WAY', 'checkout.mbwayDesc'],
-                      ['multibanco', 'Multibanco', 'checkout.multibancoDesc'],
-                      ['credit_card', 'Cartão de Crédito', 'checkout.cardDesc'],
-                      ['klarna', 'Klarna', 'checkout.klarnaDesc'],
+                      ['mbway', 'checkout.mbwayLabel', 'checkout.mbwayDesc'],
+                      ['multibanco', 'checkout.multibancoLabel', 'checkout.multibancoDesc'],
+                      ['credit_card', 'checkout.cardLabel', 'checkout.cardDesc'],
+                      ['klarna', 'checkout.klarnaLabel', 'checkout.klarnaDesc'],
                     ] as const
-                  ).map(([method, label, descKey]) => (
+                  ).map(([method, labelKey, descKey]) => (
                     <div
                       key={method}
                       onClick={() => setPaymentMethod(method)}
@@ -436,7 +437,7 @@ export default function CheckoutPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-black text-ink">{label}</span>
+                        <span className="text-sm font-black text-ink">{t(labelKey)}</span>
                         <span className="flex h-3 w-3 items-center justify-center rounded-full border border-ink">
                           {paymentMethod === method && <span className="h-2 w-2 rounded-full bg-accent-strong" />}
                         </span>
@@ -610,6 +611,12 @@ export default function CheckoutPage() {
                   )}
 
                 <div className="flex flex-wrap items-center justify-center gap-3 border-t border-border pt-4">
+                  <Link
+                    to={`/account/orders/${orderResult.order.orderNumber}`}
+                    className="rounded-xl border border-accent-border bg-accent/10 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-accent-strong hover:bg-accent/20"
+                  >
+                    {t('orders.detailTitle')}
+                  </Link>
                   <Link
                     to="/account/orders"
                     className="rounded-xl border border-border bg-surface-raised px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-ink hover:bg-surface-hover"

@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import type { PaymentMethod, OrderResult } from './types';
+import type { PaymentMethod } from './types';
 import { toApiPaymentMethod } from './utils';
-import * as api from './api';
+import { placeOrder, initiatePayment, storePaymentForOrder, type OrderResult } from '../../lib/ordersApi';
 
 export function useCheckout() {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [error, setError] = useState('');
 
-  const placeOrder = async (params: {
+  const placeOrderAndPay = async (params: {
     userId: number;
     shippingAddressId: number;
     billingAddressId?: number;
@@ -18,16 +18,17 @@ export function useCheckout() {
     setIsPlacingOrder(true);
     setError('');
     try {
-      const order = await api.checkout(params.userId, {
+      const order = await placeOrder(params.userId, {
         shippingAddressId: params.shippingAddressId,
         billingAddressId: params.billingAddressId,
         couponCode: params.couponCode,
       });
-      const payment = await api.initiatePayment({
+      const payment = await initiatePayment({
         orderId: order.id,
         paymentMethod: toApiPaymentMethod(params.paymentMethod),
         mbwayPhone: params.mbwayPhone,
       });
+      storePaymentForOrder(order.orderNumber, payment);
       return { order, payment };
     } catch (err) {
       setError(err instanceof Error ? err.message : '');
@@ -37,5 +38,5 @@ export function useCheckout() {
     }
   };
 
-  return { isPlacingOrder, error, placeOrder };
+  return { isPlacingOrder, error, placeOrder: placeOrderAndPay };
 }
