@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import type { CartItem, Product, ProductItem } from '../../types';
 import { getProductPrice } from '../../utils';
 import * as api from './api';
@@ -22,10 +22,11 @@ function saveLocalCart(items: CartItem[]): void {
 }
 
 /**
- * Hybrid cart: the client cart (with full product info) is the display source
- * of truth and is persisted to localStorage. When a user is logged in, every
- * mutation is also pushed to the server cart (best-effort) so checkout can use
- * the server-side cart. Guest items are pushed to the server on login.
+ * Split cart: guests keep a localStorage-only cart; logged-in users get a
+ * server-backed cart (loaded via GET /carts/{userId}) that is the display and
+ * checkout source of truth. Guest items are merged into the server cart once
+ * on login (absolute PUT quantities, so re-login never duplicates), then the
+ * guest storage is cleared. Logout starts a clean, empty guest cart.
  */
 export default function CartProvider({
   userId,
@@ -34,37 +35,72 @@ export default function CartProvider({
   userId: number | null;
   children: React.ReactNode;
 }) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => loadLocalCart());
-  const hasBeenGuestRef = useRef(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() =>
+    userId === null ? loadLocalCart() : []
+  );
 
-  // Persist to localStorage whenever the cart changes.
+  // Load the right cart for the current scope: localStorage for guests, the
+  // server cart (merged with any guest items) for logged-in users.
   useEffect(() => {
-    saveLocalCart(cartItems);
-  }, [cartItems]);
+    let cancelled = false;
 
-  // Push guest cart items to the server cart when a user logs in.
-  useEffect(() => {
-    if (userId === null) {
-      hasBeenGuestRef.current = true;
-      return;
-    }
-    if (!hasBeenGuestRef.current) return;
-    hasBeenGuestRef.current = false;
+    async function sync() {
+      if (userId === null) {
+        // Guest scope: hydrate from localStorage. After a logout the storage is
+        // empty (cleared on login, never written while logged in), so this
+        // yields a clean empty guest cart.
+        const items = loadLocalCart();
+        await Promise.resolve();
+        if (!cancelled) setCartItems(items);
+        return;
+      }
 
-    const currentUserId = userId;
-    async function syncGuestCart() {
-      const items = loadLocalCart();
-      for (const item of items) {
-        const productItemId = item.selectedItem?.id;
-        if (productItemId === undefined) continue;
-        try {
-          await api.addToCart(currentUserId, productItemId, item.quantity);
-        } catch {
-          // best-effort sync; ignore per-item failures
+      // Logged-in scope: never show guest items as the user's cart while the
+      // server cart loads.
+      await Promise.resolve();
+      if (!cancelled) setCartItems([]);
+
+      try {
+        const resp = await api.getCart(userId);
+        if (cancelled) return;
+
+        const serverItems = api.cartResponseToItems(resp);
+        const serverByProductItemId = new Map(
+          serverItems.map((item) => [item.selectedItem?.id, item])
+        );
+
+        // Merge guest items into the server cart exactly once. Items already on
+        // the server keep the server quantity; new ones are pushed with an
+        // absolute PUT (idempotent, so a re-run cannot duplicate them).
+        const merged = [...serverItems];
+        const guestItems = loadLocalCart();
+        for (const guest of guestItems) {
+          const productItemId = guest.selectedItem?.id;
+          if (productItemId === undefined) continue;
+          if (serverByProductItemId.has(productItemId)) continue;
+          try {
+            await api.updateQuantity(userId, productItemId, guest.quantity);
+            if (cancelled) return;
+            merged.push(guest);
+          } catch {
+            // Server rejected the item (e.g. insufficient stock); skip it.
+          }
         }
+
+        if (cancelled) return;
+        setCartItems(merged);
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Server unreachable: leave the cart empty rather than showing stale
+        // guest items as the user's cart.
+        if (!cancelled) setCartItems([]);
       }
     }
-    syncGuestCart();
+
+    sync();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   const addToCart = (product: Product, selectedItem?: ProductItem, quantity = 1) => {
@@ -73,15 +109,13 @@ export default function CartProvider({
     if (userId !== null && selectedItem) {
       api.addToCart(userId, selectedItem.id, quantity).catch(() => {});
     }
-    if (existing) {
-      setCartItems((prev) =>
-        prev.map((i) =>
+    const next = existing
+      ? cartItems.map((i) =>
           i.product.id === product.id && i.selectedItem?.sku === sku ? { ...i, quantity: i.quantity + quantity } : i
         )
-      );
-    } else {
-      setCartItems((prev) => [...prev, { product, selectedItem, quantity }]);
-    }
+      : [...cartItems, { product, selectedItem, quantity }];
+    setCartItems(next);
+    if (userId === null) saveLocalCart(next);
   };
 
   const updateQuantity = (productId: number, itemSku: string | undefined, delta: number) => {
@@ -92,16 +126,18 @@ export default function CartProvider({
       if (userId !== null && item.selectedItem) {
         api.removeFromCart(userId, item.selectedItem.id).catch(() => {});
       }
-      setCartItems((prev) => prev.filter((i) => !(i.product.id === productId && i.selectedItem?.sku === itemSku)));
+      const next = cartItems.filter((i) => !(i.product.id === productId && i.selectedItem?.sku === itemSku));
+      setCartItems(next);
+      if (userId === null) saveLocalCart(next);
     } else {
       if (userId !== null && item.selectedItem) {
         api.updateQuantity(userId, item.selectedItem.id, newQty).catch(() => {});
       }
-      setCartItems((prev) =>
-        prev.map((i) =>
-          i.product.id === productId && i.selectedItem?.sku === itemSku ? { ...i, quantity: newQty } : i
-        )
+      const next = cartItems.map((i) =>
+        i.product.id === productId && i.selectedItem?.sku === itemSku ? { ...i, quantity: newQty } : i
       );
+      setCartItems(next);
+      if (userId === null) saveLocalCart(next);
     }
   };
 
@@ -110,7 +146,9 @@ export default function CartProvider({
     if (userId !== null && item?.selectedItem) {
       api.removeFromCart(userId, item.selectedItem.id).catch(() => {});
     }
-    setCartItems((prev) => prev.filter((i) => !(i.product.id === productId && i.selectedItem?.sku === itemSku)));
+    const next = cartItems.filter((i) => !(i.product.id === productId && i.selectedItem?.sku === itemSku));
+    setCartItems(next);
+    if (userId === null) saveLocalCart(next);
   };
 
   const clearCart = () => {
@@ -118,6 +156,7 @@ export default function CartProvider({
       api.clearCart(userId).catch(() => {});
     }
     setCartItems([]);
+    if (userId === null) saveLocalCart([]);
   };
 
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
