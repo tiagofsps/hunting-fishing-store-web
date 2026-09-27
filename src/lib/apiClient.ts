@@ -29,14 +29,22 @@ async function refreshAccessToken(): Promise<string | null> {
     refreshPromise = (async () => {
       try {
         const response = await fetch('/api/v1/auth/refresh', { method: 'POST' });
-        if (!response.ok) return null;
+        if (!response.ok) {
+          // The refresh cookie is gone or rejected: the stored access token is
+          // unusable and can never be renewed. Drop it so the session degrades
+          // to a clean guest instead of re-sending a dead token forever.
+          clearToken();
+          return null;
+        }
         const data = (await response.json()) as { accessToken?: string };
         if (data.accessToken) {
           setToken(data.accessToken);
           return data.accessToken;
         }
+        clearToken();
         return null;
       } catch {
+        // Network failure is transient; keep the token so a later request can retry.
         return null;
       } finally {
         refreshPromise = null;
@@ -76,7 +84,17 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 
   const isAuthAttempt = path.includes('/auth/login') || path.includes('/auth/register');
 
-  if (response.status === 401 && !isAuthAttempt) {
+  // Anonymous catalog reads are public. A 401 there means an auth problem, not
+  // an expired token, so retrying after a refresh only burns rate-limit quota
+  // on /auth/refresh and hides the real server error behind a 401.
+  const isPublicRead =
+    !getToken() &&
+    (path.startsWith('/api/v1/products') ||
+      path.startsWith('/api/v1/categories') ||
+      path.startsWith('/api/v1/brands') ||
+      path.startsWith('/api/v1/promotions'));
+
+  if (response.status === 401 && !isAuthAttempt && !isPublicRead) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       const retryHeaders = new Headers(options.headers);
