@@ -6,12 +6,26 @@ import { CartContext } from './context';
 
 const STORAGE_KEY = 'cart_items';
 
+/**
+ * A cart line is only orderable if it carries a `productItemId`. Quick-add
+ * paths (e.g. the shop grid) pass no variant, so fall back to the first
+ * orderable one. Lines already persisted before this rule existed are
+ * normalised on load rather than being left unorderable.
+ */
+function resolveVariant(selectedItem: ProductItem | undefined, product: Product): ProductItem | undefined {
+  return selectedItem ?? product.items?.find((item) => item.active !== false && item.stockQuantity > 0);
+}
+
 function loadLocalCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
+    if (!Array.isArray(parsed)) return [];
+    return (parsed as CartItem[]).map((item) => ({
+      ...item,
+      selectedItem: resolveVariant(item.selectedItem, item.product),
+    }));
   } catch {
     return [];
   }
@@ -104,16 +118,17 @@ export default function CartProvider({
   }, [userId]);
 
   const addToCart = (product: Product, selectedItem?: ProductItem, quantity = 1) => {
-    const sku = selectedItem?.sku;
+    const variant = resolveVariant(selectedItem, product);
+    const sku = variant?.sku;
     const existing = cartItems.find((i) => i.product.id === product.id && i.selectedItem?.sku === sku);
-    if (userId !== null && selectedItem) {
-      api.addToCart(userId, selectedItem.id, quantity).catch(() => {});
+    if (userId !== null && variant) {
+      api.addToCart(userId, variant.id, quantity).catch(() => {});
     }
     const next = existing
       ? cartItems.map((i) =>
           i.product.id === product.id && i.selectedItem?.sku === sku ? { ...i, quantity: i.quantity + quantity } : i
         )
-      : [...cartItems, { product, selectedItem, quantity }];
+      : [...cartItems, { product, selectedItem: variant, quantity }];
     setCartItems(next);
     if (userId === null) saveLocalCart(next);
   };

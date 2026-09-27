@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import type { PaymentMethod } from './types';
 import { toApiPaymentMethod } from './utils';
-import { placeOrder, initiatePayment, storePaymentForOrder, type OrderResult } from '../../lib/ordersApi';
+import {
+  placeOrder,
+  initiatePayment,
+  storePaymentForOrder,
+  type CheckoutItemRequest,
+  type OrderResult,
+} from '../../lib/ordersApi';
 
 export function useCheckout() {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -12,6 +18,11 @@ export function useCheckout() {
     shippingAddressId: number;
     billingAddressId?: number;
     couponCode?: string;
+    /**
+     * Line items from the visible cart. Omit to let the backend fall back to
+     * the server cart; never pass an empty array.
+     */
+    items?: CheckoutItemRequest[];
     paymentMethod: PaymentMethod;
     mbwayPhone?: string;
   }): Promise<OrderResult> => {
@@ -22,6 +33,7 @@ export function useCheckout() {
         shippingAddressId: params.shippingAddressId,
         billingAddressId: params.billingAddressId,
         couponCode: params.couponCode,
+        items: params.items,
       });
       const payment = await initiatePayment({
         orderId: order.id,

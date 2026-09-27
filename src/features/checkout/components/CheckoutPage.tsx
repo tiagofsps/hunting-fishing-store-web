@@ -135,11 +135,22 @@ export default function CheckoutPage() {
       return;
     }
     setError('');
+    // Build the order from the lines the user actually sees, so the placed
+    // order matches the summary. A line with no productItemId cannot be
+    // ordered; rather than silently dropping it (which would create an order
+    // missing items the customer paid for) or sending an empty array (which
+    // the backend rejects as an empty cart), omit `items` and let the backend
+    // fall back to the server cart.
+    const orderable = cartItems.flatMap((i) =>
+      i.selectedItem ? [{ productItemId: i.selectedItem.id, quantity: i.quantity }] : []
+    );
+    const items = cartItems.length > 0 && orderable.length === cartItems.length ? orderable : undefined;
     try {
       const result = await placeOrder({
         userId: user.id,
         shippingAddressId: selectedAddressId,
         couponCode: couponCode.trim() || undefined,
+        items,
         paymentMethod,
         mbwayPhone: paymentMethod === 'mbway' ? mbwayPhone.trim() : undefined,
       });

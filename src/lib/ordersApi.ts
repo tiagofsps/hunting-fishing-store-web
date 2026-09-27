@@ -51,10 +51,25 @@ export interface PaymentResponse {
   referenceExpiresAt: string | null;
 }
 
+export interface CheckoutItemRequest {
+  productItemId: number;
+  quantity: number;
+}
+
 export interface CheckoutRequest {
   shippingAddressId: number;
   billingAddressId?: number;
   couponCode?: string;
+  /**
+   * Line items taken from the cart the user actually sees, so the order is
+   * built from the client cart rather than the server cart mirror.
+   *
+   * Optional on purpose: when omitted the backend falls back to the server
+   * cart. An empty array is NOT a valid fallback — the backend treats a
+   * present-but-empty list as "client is the source of truth" and rejects it
+   * as an empty cart — so callers must omit the key instead of sending `[]`.
+   */
+  items?: CheckoutItemRequest[];
 }
 
 export interface OrderResult {
