@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import type { Brand } from '../../../types';
 import { formatImageUrl } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
@@ -23,9 +24,11 @@ export default function BrandSection({ brands }: BrandSectionProps) {
 
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
           {brands.map((brand) => (
-            <div
+            <Link
               key={brand.id}
-              className="flex items-center justify-center rounded-2xl border border-border bg-surface px-8 py-5 transition-all hover:border-accent-border hover:bg-surface-hover hover:scale-105 shadow-xs"
+              to={`/shop?brandId=${brand.id}`}
+              aria-label={brand.name}
+              className="flex items-center justify-center rounded-2xl border border-border bg-surface px-8 py-5 shadow-xs transition-all hover:border-accent-border hover:bg-surface-hover hover:scale-105 focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:outline-none"
             >
               {brand.logoUrl && brand.logoUrl !== 'https://example.com/logo.png' ? (
                 <img
@@ -36,7 +39,7 @@ export default function BrandSection({ brands }: BrandSectionProps) {
               ) : (
                 <span className="text-lg font-black tracking-tight text-ink">{brand.name}</span>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
