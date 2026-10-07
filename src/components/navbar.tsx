@@ -6,6 +6,8 @@ import { useCart } from '../features/cart/hooks';
 import { useAuth } from '../features/auth/hooks';
 import { useOverlays } from './overlay-context';
 import UserMenu from './UserMenu';
+import NavDropdown, { NavMenuList } from './NavDropdown';
+import { useNavData } from './useNavData';
 
 export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
@@ -13,8 +15,10 @@ export default function Navbar() {
   const { user } = useAuth();
   const { openCartDrawer, openAuth } = useOverlays();
   const navigate = useNavigate();
+  const { categoryLinks, brandLinks } = useNavData();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openMobileSection, setOpenMobileSection] = useState<'categories' | 'brands' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const navigation = [
@@ -52,6 +56,8 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
+          <NavDropdown label={t('nav.categories')} items={categoryLinks} />
+          <NavDropdown label={t('nav.brands')} items={brandLinks} />
         </nav>
 
         {/* Search Bar & Actions */}
@@ -167,6 +173,45 @@ export default function Navbar() {
               </Link>
             ))}
           </nav>
+
+          {(['categories', 'brands'] as const).map((section) => {
+            const items = section === 'categories' ? categoryLinks : brandLinks;
+            const label = section === 'categories' ? t('nav.categories') : t('nav.brands');
+            const isOpen = openMobileSection === section;
+            if (items.length === 0) return null;
+            return (
+              <div key={section} className="mt-1">
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpenMobileSection(isOpen ? null : section)}
+                  className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-body hover:bg-surface-hover hover:text-accent-strong transition-colors"
+                >
+                  {label}
+                  <svg
+                    className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isOpen && (
+                  <NavMenuList
+                    items={items}
+                    onNavigate={() => {
+                      setIsMenuOpen(false);
+                      setOpenMobileSection(null);
+                    }}
+                    className="mb-2 ml-2"
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </header>
