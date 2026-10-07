@@ -20,7 +20,6 @@ export default function Navbar() {
   const navigation = [
     { name: t('nav.home'), to: '/' },
     { name: t('nav.shop'), to: '/shop' },
-    ...(user?.role === 'ADMIN' ? [{ name: t('nav.admin'), to: '/admin' }] : []),
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {

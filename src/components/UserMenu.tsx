@@ -104,6 +104,16 @@ export default function UserMenu() {
             >
               {t('nav.myOrders')}
             </button>
+            {user?.role === 'ADMIN' && (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={select(() => navigate('/admin'))}
+                className={itemClassName}
+              >
+                {t('nav.admin')}
+              </button>
+            )}
           </div>
 
           <div className="my-1 border-t border-border" />
