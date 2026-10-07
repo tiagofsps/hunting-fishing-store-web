@@ -37,6 +37,7 @@ export const commonTranslations = {
     'footer.facebook': 'Facebook',
     'footer.instagram': 'Instagram',
     'footer.youtube': 'YouTube',
+    'footer.tiktok': 'TikTok',
 
     // Common
     'common.retry': 'Try Again',
@@ -89,6 +90,7 @@ export const commonTranslations = {
     'footer.facebook': 'Facebook',
     'footer.instagram': 'Instagram',
     'footer.youtube': 'YouTube',
+    'footer.tiktok': 'TikTok',
 
     // Common
     'common.retry': 'Tentar novamente',

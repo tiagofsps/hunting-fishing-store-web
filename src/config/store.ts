@@ -16,6 +16,7 @@ export const STORE_CONFIG = {
     facebook: 'https://facebook.com',
     instagram: 'https://instagram.com',
     youtube: 'https://youtube.com',
+    tiktok: 'https://www.tiktok.com/@wildlife',
   },
 } as const;
 
