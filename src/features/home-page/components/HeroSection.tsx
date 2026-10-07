@@ -64,7 +64,7 @@ export default function HeroSection() {
             <div className="relative mx-auto max-w-md rounded-3xl border border-border bg-surface-raised p-4 shadow-xl">
               <div className="relative aspect-4/5 overflow-hidden rounded-2xl bg-surface">
                 <img
-                  src="https://loremflickr.com/800/1000/fishing,hunting?lock=99"
+                  src="/images/hero/outdoor.svg"
                   alt={`Equipamento ${STORE_CONFIG.name}`}
                   className="h-full w-full object-cover"
                 />
