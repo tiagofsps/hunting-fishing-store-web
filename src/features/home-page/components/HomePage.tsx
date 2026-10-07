@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import HeroSection from './HeroSection';
 import ValuePropsSection from './ValuePropsSection';
 import ProductSection from './ProductSection';
@@ -12,11 +11,9 @@ import { useLanguage } from '../../../i18n/useLanguage';
 
 export default function HomePage() {
   const { t } = useLanguage();
-  const { products, categories, brands, promotions, loading, error } = useHomeData();
+  const { products, brands, promotions, loading, error } = useHomeData();
   const { addToCart } = useCart();
   const { openCartDrawer, openQuickView } = useOverlays();
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   const handleAddToCart = (product: Product, selectedItem?: ProductItem) => {
     addToCart(product, selectedItem);
@@ -51,11 +48,7 @@ export default function HomePage() {
         <>
           <ProductSection
             products={products}
-            categories={categories}
             promotions={promotions}
-            selectedCategoryId={selectedCategoryId}
-            onSelectCategory={setSelectedCategoryId}
-            searchQuery=""
             onAddToCart={handleAddToCart}
             onQuickView={openQuickView}
           />

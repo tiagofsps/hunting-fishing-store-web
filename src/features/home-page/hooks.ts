@@ -15,7 +15,8 @@ export function useHomeData() {
       try {
         setLoading(true);
         const [p, c, b, prom] = await Promise.all([
-          catalogApi.getProductsPage({ size: 20 }),
+          // The landing page only surfaces a carousel of recent products.
+          catalogApi.getProductsPage({ size: 8 }),
           catalogApi.getCategories(),
           catalogApi.getBrands(),
           catalogApi.getPromotions(),

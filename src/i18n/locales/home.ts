@@ -37,6 +37,9 @@ export const homeTranslations = {
     // Product Section
     'prod.subtitle': 'Main Catalog',
     'prod.title': 'Featured Products & Gear',
+    'prod.viewAll': 'View all products',
+    'prod.previous': 'Previous products',
+    'prod.next': 'Next products',
     'prod.allPill': 'All',
     'prod.sortDefault': 'Sort: Featured',
     'prod.sortPriceAsc': 'Price: Low → High',
@@ -115,6 +118,9 @@ export const homeTranslations = {
     // Product Section
     'prod.subtitle': 'Catálogo Principal',
     'prod.title': 'Equipamento & Produtos em Destaque',
+    'prod.viewAll': 'Ver todos os produtos',
+    'prod.previous': 'Produtos anteriores',
+    'prod.next': 'Produtos seguintes',
     'prod.allPill': 'Todos',
     'prod.sortDefault': 'Ordenar: Destaques',
     'prod.sortPriceAsc': 'Preço: Menor → Maior',
