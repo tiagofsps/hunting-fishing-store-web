@@ -5,11 +5,12 @@ import { STORE_CONFIG } from '../config/store';
 import { useCart } from '../features/cart/hooks';
 import { useAuth } from '../features/auth/hooks';
 import { useOverlays } from './overlay-context';
+import UserMenu from './UserMenu';
 
 export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const { totalCount } = useCart();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { openCartDrawer, openAuth } = useOverlays();
   const navigate = useNavigate();
 
@@ -19,12 +20,6 @@ export default function Navbar() {
   const navigation = [
     { name: t('nav.home'), to: '/' },
     { name: t('nav.shop'), to: '/shop' },
-    ...(user
-      ? [
-          { name: t('nav.myOrders'), to: '/account/orders' },
-          { name: t('nav.account'), to: '/account' },
-        ]
-      : []),
     ...(user?.role === 'ADMIN' ? [{ name: t('nav.admin'), to: '/admin' }] : []),
   ];
 
@@ -97,18 +92,7 @@ export default function Navbar() {
 
           {/* Auth Button */}
           {user ? (
-            <div className="flex items-center gap-2 rounded-full border border-border bg-surface-raised p-1 text-xs">
-              <span className="pl-3 pr-1 font-black text-ink flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${user.role === 'ADMIN' ? 'bg-sale' : 'bg-accent-strong'}`}></span>
-                {user.firstName}
-              </span>
-              <button
-                onClick={() => logout()}
-                className="rounded-full bg-ink/5 px-2.5 py-1.5 font-bold text-body hover:bg-sale hover:text-white transition-all uppercase tracking-wider text-[10px]"
-              >
-                {t('auth.logout')}
-              </button>
-            </div>
+            <UserMenu />
           ) : (
             <button
               onClick={openAuth}

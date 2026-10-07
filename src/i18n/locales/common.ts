@@ -13,6 +13,7 @@ export const commonTranslations = {
     'nav.shop': 'Shop',
     'nav.account': 'My Account',
     'nav.myOrders': 'My Orders',
+    'nav.userMenu': 'Account menu',
     'nav.admin': 'Admin',
 
     // Promotion Banner
@@ -64,6 +65,7 @@ export const commonTranslations = {
     'nav.shop': 'Loja',
     'nav.account': 'A Minha Conta',
     'nav.myOrders': 'As Minhas Encomendas',
+    'nav.userMenu': 'Menu da conta',
     'nav.admin': 'Admin',
 
     // Promotion Banner
