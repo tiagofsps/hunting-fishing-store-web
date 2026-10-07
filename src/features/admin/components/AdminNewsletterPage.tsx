@@ -5,11 +5,13 @@ import {
   type NewsletterSubscription,
 } from '../api';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const PAGE_SIZE = 20;
 
 export default function AdminNewsletterPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [subscriptions, setSubscriptions] = useState<NewsletterSubscription[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -30,7 +32,7 @@ export default function AdminNewsletterPage() {
         setSubscriptions(data.content);
         setTotal(data.totalElements);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -40,7 +42,7 @@ export default function AdminNewsletterPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, reloadToken]);
+  }, [page, reloadToken, describeError]);
 
   const handleUnsubscribe = async (subscription: NewsletterSubscription) => {
     if (!window.confirm(`${t('admin.unsubscribeConfirm')} ${subscription.email}`)) return;
@@ -51,7 +53,7 @@ export default function AdminNewsletterPage() {
       setNotice(t('admin.movementRecorded'));
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     }
   };
 

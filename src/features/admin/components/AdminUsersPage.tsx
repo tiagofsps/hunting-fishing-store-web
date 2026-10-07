@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { listUsers } from '../api';
 import type { UserResponse } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const PAGE_SIZE = 20;
 
 export default function AdminUsersPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -25,7 +27,7 @@ export default function AdminUsersPage() {
         setUsers(data.content);
         setTotal(data.totalElements);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -35,7 +37,7 @@ export default function AdminUsersPage() {
     return () => {
       cancelled = true;
     };
-  }, [page]);
+  }, [page, describeError]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

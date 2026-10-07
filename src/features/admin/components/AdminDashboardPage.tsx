@@ -5,6 +5,7 @@ import { getProductsPage } from '../../../lib/catalogApi';
 import type { OrderResponse } from '../../../lib/ordersApi';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 interface Stats {
   products: number;
@@ -15,6 +16,7 @@ interface Stats {
 
 export default function AdminDashboardPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentOrders, setRecentOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ export default function AdminDashboardPage() {
         });
         setRecentOrders(orders.content);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -51,7 +53,7 @@ export default function AdminDashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [describeError]);
 
   const cards = [
     { label: t('admin.statProducts'), value: stats?.products },

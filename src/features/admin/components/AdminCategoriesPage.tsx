@@ -6,6 +6,7 @@ import { createCategory, updateCategory, deleteCategory, type AdminCategoryPaylo
 import { adminCategorySchema, type AdminCategoryFormData } from '../validation';
 import type { Category } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -23,6 +24,7 @@ function toPayload(data: AdminCategoryFormData): AdminCategoryPayload {
 
 export default function AdminCategoriesPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function AdminCategoriesPage() {
         const data = await getCategories();
         if (!cancelled) setCategories(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -54,7 +56,7 @@ export default function AdminCategoriesPage() {
     return () => {
       cancelled = true;
     };
-  }, [reloadToken]);
+  }, [reloadToken, describeError]);
 
   const reset = () => {
     setEditingId(null);
@@ -80,7 +82,7 @@ export default function AdminCategoriesPage() {
       reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }
@@ -94,7 +96,7 @@ export default function AdminCategoriesPage() {
       if (editingId === category.id) reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     }
   };
 

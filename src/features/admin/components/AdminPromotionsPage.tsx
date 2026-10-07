@@ -11,6 +11,7 @@ import {
 import { adminPromotionSchema, type AdminPromotionFormData } from '../validation';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -25,6 +26,7 @@ const TARGET_KEYS: Record<PromotionTargetType, string> = {
 
 export default function AdminPromotionsPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [promotions, setPromotions] = useState<AdminPromotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -56,7 +58,7 @@ export default function AdminPromotionsPage() {
         const data = await listPromotions();
         if (!cancelled) setPromotions(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -66,7 +68,7 @@ export default function AdminPromotionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [reloadToken]);
+  }, [reloadToken, describeError]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     setError('');
@@ -88,7 +90,7 @@ export default function AdminPromotionsPage() {
       rulesField.replace([]);
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }
@@ -102,7 +104,7 @@ export default function AdminPromotionsPage() {
       await deletePromotion(promotion.id);
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     }
   };
 

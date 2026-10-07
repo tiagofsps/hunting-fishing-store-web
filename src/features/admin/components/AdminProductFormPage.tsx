@@ -6,6 +6,7 @@ import { adminProductSchema, type AdminProductFormData } from '../validation';
 import { createProduct, updateProduct, toAdminProductPayload } from '../api';
 import { getProductById, getCategories, getBrands } from '../../../lib/catalogApi';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -28,6 +29,7 @@ function parseAttributes(raw: string | undefined): Record<string, string> | unde
 
 export default function AdminProductFormPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = id !== undefined;
@@ -111,7 +113,7 @@ export default function AdminProductFormPage() {
           );
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -121,7 +123,7 @@ export default function AdminProductFormPage() {
     return () => {
       cancelled = true;
     };
-  }, [id, isEditing, form]);
+  }, [id, isEditing, form, describeError]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     setError('');
@@ -140,7 +142,7 @@ export default function AdminProductFormPage() {
       setSaved(true);
       navigate('/admin/products');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }

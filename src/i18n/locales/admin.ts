@@ -160,6 +160,7 @@ export const adminTranslations = {
     // Generic
     'admin.saving': 'Saving...',
     'admin.errorTitle': 'Something went wrong:',
+    'admin.forbiddenAction': "You don't have permission to perform this action.",
     'admin.slugInvalid': 'Use lowercase letters, numbers and dashes only',
     'admin.licenseTypeRequired': 'A licence type is required',
     'admin.needAtLeastOneItem': 'Add at least one variant',
@@ -325,6 +326,7 @@ export const adminTranslations = {
     // Generic
     'admin.saving': 'A guardar...',
     'admin.errorTitle': 'Ocorreu um erro:',
+    'admin.forbiddenAction': 'Não tens permissão para realizar esta ação.',
     'admin.slugInvalid': 'Usa apenas letras minúsculas, números e hífens',
     'admin.licenseTypeRequired': 'É necessário um tipo de licença',
     'admin.needAtLeastOneItem': 'Adiciona pelo menos uma variante',

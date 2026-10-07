@@ -9,12 +9,14 @@ import {
 import type { OrderResponse, OrderStatus } from '../../../lib/ordersApi';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const PAGE_SIZE = 20;
 const STATUSES: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
 export default function AdminOrdersPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [searchParams, setSearchParams] = useSearchParams();
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [total, setTotal] = useState(0);
@@ -41,7 +43,7 @@ export default function AdminOrdersPage() {
         setOrders(data.content);
         setTotal(data.totalElements);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -51,7 +53,7 @@ export default function AdminOrdersPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, statusFilter, reloadToken]);
+  }, [page, statusFilter, reloadToken, describeError]);
 
   const updateParams = (next: Record<string, string>) => setSearchParams(next);
 
@@ -64,7 +66,7 @@ export default function AdminOrdersPage() {
       setNotice(t('admin.statusUpdated'));
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setPendingId(null);
     }

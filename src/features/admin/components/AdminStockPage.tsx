@@ -5,6 +5,7 @@ import { getProductsPage } from '../../../lib/catalogApi';
 import { createStockMovement, listStockMovements, type StockMovement } from '../api';
 import { stockMovementSchema, type StockMovementFormData } from '../validation';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -20,6 +21,7 @@ const MOVEMENT_LABELS: Record<StockMovementFormData['type'], string> = {
 
 export default function AdminStockPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [items, setItems] = useState<{ id: number; sku: string; name: string; stock: number }[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [movements, setMovements] = useState<StockMovement[]>([]);
@@ -55,7 +57,7 @@ export default function AdminStockPage() {
           )
         );
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -65,7 +67,7 @@ export default function AdminStockPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [describeError]);
 
   useEffect(() => {
     if (selectedItemId === null) return;
@@ -76,7 +78,7 @@ export default function AdminStockPage() {
         const data = await listStockMovements(selectedItemId);
         if (!cancelled) setMovements(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       }
     };
 
@@ -84,7 +86,7 @@ export default function AdminStockPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedItemId]);
+  }, [selectedItemId, describeError]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     if (selectedItemId === null) return;
@@ -102,7 +104,7 @@ export default function AdminStockPage() {
       form.reset({ quantity: 1, type: 'PURCHASE', notes: '' });
       setMovements(await listStockMovements(selectedItemId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }

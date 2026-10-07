@@ -5,11 +5,13 @@ import { deleteProduct } from '../api';
 import { formatCurrency, getProductImageUrl } from '../../../utils';
 import type { Product } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const PAGE_SIZE = 20;
 
 export default function AdminProductsPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
@@ -34,7 +36,7 @@ export default function AdminProductsPage() {
           setTotal(data.totalElements);
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -44,7 +46,7 @@ export default function AdminProductsPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, query, reloadToken]);
+  }, [page, query, reloadToken, describeError]);
 
   const updateParams = (next: Record<string, string>) => {
     setSearchParams(next);
@@ -61,7 +63,7 @@ export default function AdminProductsPage() {
       await deleteProduct(product.id);
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     }
   };
 

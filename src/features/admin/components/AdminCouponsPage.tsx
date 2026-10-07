@@ -5,6 +5,7 @@ import { listCoupons, createCoupon, type AdminCoupon } from '../api';
 import { adminCouponSchema, type AdminCouponFormData } from '../validation';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -13,6 +14,7 @@ const fieldClass = 'mb-1 block text-xs font-bold text-ink';
 
 export default function AdminCouponsPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [coupons, setCoupons] = useState<AdminCoupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,7 +42,7 @@ export default function AdminCouponsPage() {
         const data = await listCoupons();
         if (!cancelled) setCoupons(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -50,7 +52,7 @@ export default function AdminCouponsPage() {
     return () => {
       cancelled = true;
     };
-  }, [reloadToken]);
+  }, [reloadToken, describeError]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     setError('');
@@ -71,7 +73,7 @@ export default function AdminCouponsPage() {
       form.reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }

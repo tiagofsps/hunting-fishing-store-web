@@ -6,6 +6,7 @@ import { createBrand, updateBrand, deleteBrand, type AdminBrandPayload } from '.
 import { adminBrandSchema, type AdminBrandFormData } from '../validation';
 import type { Brand } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { useAdminError } from '../hooks';
 
 const inputClass =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
@@ -22,6 +23,7 @@ function toPayload(data: AdminBrandFormData): AdminBrandPayload {
 
 export default function AdminBrandsPage() {
   const { t } = useLanguage();
+  const describeError = useAdminError();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ export default function AdminBrandsPage() {
         const data = await getBrands();
         if (!cancelled) setBrands(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '');
+        if (!cancelled) setError(describeError(err));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -53,7 +55,7 @@ export default function AdminBrandsPage() {
     return () => {
       cancelled = true;
     };
-  }, [reloadToken]);
+  }, [reloadToken, describeError]);
 
   const reset = () => {
     setEditingId(null);
@@ -74,7 +76,7 @@ export default function AdminBrandsPage() {
       reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     } finally {
       setIsSaving(false);
     }
@@ -88,7 +90,7 @@ export default function AdminBrandsPage() {
       if (editingId === brand.id) reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '');
+      setError(describeError(err));
     }
   };
 
