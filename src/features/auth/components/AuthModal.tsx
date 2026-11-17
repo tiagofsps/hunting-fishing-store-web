@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, registerSchema, type LoginFormData, type RegisterFormData } from '../validation';
 import * as api from '../api';
 import { ApiError } from '../../../lib/apiClient';
 import { useLanguage } from '../../../i18n/useLanguage';
-import { Input } from '../../../components/ui/Input';
+import { ForgotPasswordPanel } from './ForgotPasswordPanel';
+import { LoginForm } from './LoginForm';
+import { RegisterForm } from './RegisterForm';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,6 +18,10 @@ interface AuthModalProps {
 
 type Tab = 'login' | 'register';
 
+/**
+ * Sign-in / registration / password-reset dialog. The container owns the tab,
+ * error and submission state; each view is a presentational component.
+ */
 export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: AuthModalProps) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>('login');
@@ -91,7 +97,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
     }
   };
 
-  const handleForgotSubmit = async (e: React.FormEvent) => {
+  const handleForgotSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
@@ -104,6 +110,21 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
       setIsSubmitting(false);
     }
   };
+
+  const backFromForgot = () => {
+    setShowForgot(false);
+    setError('');
+  };
+
+  const selectTab = (tab: Tab) => {
+    setActiveTab(tab);
+    setError('');
+  };
+
+  const tabClass = (tab: Tab) =>
+    `flex-1 pb-3 text-sm font-black uppercase tracking-wider transition-all border-b-2 ${
+      activeTab === tab ? 'border-accent-strong text-ink' : 'border-transparent text-muted'
+    }`;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -121,7 +142,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
           aria-label={activeTab === 'login' ? t('auth.signIn') : t('auth.register')}
           className="relative w-full max-w-md transform overflow-hidden rounded-3xl bg-surface-raised p-6 text-left shadow-2xl transition-all sm:p-8 border border-border"
         >
-          {/* Close button */}
           <button
             onClick={onClose}
             className="absolute right-4 top-4 z-10 rounded-full p-2 text-muted hover:bg-surface-hover hover:text-ink transition-colors"
@@ -133,75 +153,22 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
           </button>
 
           {showForgot ? (
-            <div>
-              <h2 className="text-xl font-black text-ink">{t('auth.forgotTitle')}</h2>
-              <p className="mt-2 text-xs text-muted">{t('auth.forgotDesc')}</p>
-
-              {forgotSent ? (
-                <div className="mt-6 rounded-xl bg-accent/10 border border-accent/30 p-4 text-xs font-bold text-ink">
-                  {t('auth.forgotSent')}
-                </div>
-              ) : (
-                <form onSubmit={handleForgotSubmit} className="mt-6 space-y-4">
-                  {error && (
-                    <div className="rounded-xl bg-sale/10 border border-sale/30 p-3 text-xs font-bold text-sale text-center">
-                      {error}
-                    </div>
-                  )}
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <Input
-                      type="email"
-                      required
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-xl bg-ink py-3.5 mt-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-ink/90 active:scale-95 transition-all shadow-md disabled:opacity-50"
-                  >
-                    {isSubmitting ? '...' : t('auth.sendReset')}
-                  </button>
-                </form>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowForgot(false);
-                  setError('');
-                }}
-                className="mt-4 text-xs font-bold text-accent-strong hover:underline"
-              >
-                ← {t('auth.backToLogin')}
-              </button>
-            </div>
+            <ForgotPasswordPanel
+              email={forgotEmail}
+              onEmailChange={setForgotEmail}
+              onSubmit={handleForgotSubmit}
+              sent={forgotSent}
+              error={error}
+              isSubmitting={isSubmitting}
+              onBack={backFromForgot}
+            />
           ) : (
             <>
-              {/* Tabs */}
-              <div className="flex border-b border-border mb-6">
-                <button
-                  onClick={() => {
-                    setActiveTab('login');
-                    setError('');
-                  }}
-                  className={`flex-1 pb-3 text-sm font-black uppercase tracking-wider transition-all border-b-2 ${
-                    activeTab === 'login' ? 'border-accent-strong text-ink' : 'border-transparent text-muted'
-                  }`}
-                >
+              <div className="flex border-b border-border mb-6" role="tablist">
+                <button role="tab" aria-selected={activeTab === 'login'} onClick={() => selectTab('login')} className={tabClass('login')}>
                   {t('auth.signIn')}
                 </button>
-                <button
-                  onClick={() => {
-                    setActiveTab('register');
-                    setError('');
-                  }}
-                  className={`flex-1 pb-3 text-sm font-black uppercase tracking-wider transition-all border-b-2 ${
-                    activeTab === 'register' ? 'border-accent-strong text-ink' : 'border-transparent text-muted'
-                  }`}
-                >
+                <button role="tab" aria-selected={activeTab === 'register'} onClick={() => selectTab('register')} className={tabClass('register')}>
                   {t('auth.register')}
                 </button>
               </div>
@@ -213,125 +180,14 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
               )}
 
               {activeTab === 'login' ? (
-                <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <Input
-                      type="email"
-                      {...loginForm.register('email')}
-                    />
-                    {loginForm.formState.errors.email && (
-                      <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorInvalidEmail')}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.password')}</label>
-                    <Input
-                      type="password"
-                      {...loginForm.register('password')}
-                    />
-                    {loginForm.formState.errors.password && (
-                      <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorPasswordRequired')}</p>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowForgot(true)}
-                    className="text-xs font-bold text-accent-strong hover:underline"
-                  >
-                    {t('auth.forgotPassword')}
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-xl bg-ink py-3.5 mt-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-ink/90 active:scale-95 transition-all shadow-md disabled:opacity-50"
-                  >
-                    {isSubmitting ? '...' : t('auth.submitLogin')}
-                  </button>
-                </form>
+                <LoginForm
+                  form={loginForm}
+                  onSubmit={handleLoginSubmit}
+                  isSubmitting={isSubmitting}
+                  onForgotPassword={() => setShowForgot(true)}
+                />
               ) : (
-                <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs font-bold text-ink mb-1">{t('auth.firstName')}</label>
-                      <Input
-                        type="text"
-                        {...registerForm.register('firstName')}
-                      />
-                      {registerForm.formState.errors.firstName && (
-                        <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorRequired')}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-ink mb-1">{t('auth.lastName')}</label>
-                      <Input
-                        type="text"
-                        {...registerForm.register('lastName')}
-                      />
-                      {registerForm.formState.errors.lastName && (
-                        <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorRequired')}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <Input
-                      type="email"
-                      {...registerForm.register('email')}
-                    />
-                    {registerForm.formState.errors.email && (
-                      <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorInvalidEmail')}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.password')}</label>
-                    <Input
-                      type="password"
-                      {...registerForm.register('password')}
-                    />
-                    {registerForm.formState.errors.password && (
-                      <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorPasswordMin')}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-ink mb-1">{t('auth.phone')}</label>
-                    <Input
-                      type="tel"
-                      {...registerForm.register('phone')}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs font-bold text-ink mb-1">{t('auth.huntingLicense')}</label>
-                      <Input
-                        type="text"
-                        {...registerForm.register('huntingLicenseNumber')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-ink mb-1">{t('auth.fishingLicense')}</label>
-                      <Input
-                        type="text"
-                        {...registerForm.register('fishingLicenseNumber')}
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-xl bg-ink py-3.5 mt-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-ink/90 active:scale-95 transition-all shadow-md disabled:opacity-50"
-                  >
-                    {isSubmitting ? '...' : t('auth.submitRegister')}
-                  </button>
-                </form>
+                <RegisterForm form={registerForm} onSubmit={handleRegisterSubmit} isSubmitting={isSubmitting} />
               )}
             </>
           )}
