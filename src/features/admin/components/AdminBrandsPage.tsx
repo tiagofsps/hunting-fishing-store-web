@@ -7,11 +7,8 @@ import { adminBrandSchema, type AdminBrandFormData } from '../validation';
 import type { Brand } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const fieldClass = 'mb-1 block text-xs font-bold text-ink';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
 
 function toPayload(data: AdminBrandFormData): AdminBrandPayload {
   return {
@@ -110,20 +107,20 @@ export default function AdminBrandsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={fieldClass}>{t('admin.productName')}</label>
-            <input type="text" {...form.register('name')} className={inputClass} />
+            <Label>{t('admin.productName')}</Label>
+            <Input type="text" {...form.register('name')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.productSlug')}</label>
-            <input type="text" {...form.register('slug')} className={inputClass} />
+            <Label>{t('admin.productSlug')}</Label>
+            <Input type="text" {...form.register('slug')} />
             {form.formState.errors.slug && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.slugInvalid')}</p>
             )}
           </div>
         </div>
         <div>
-          <label className={fieldClass}>{t('admin.logoUrl')}</label>
-          <input type="text" {...form.register('logoUrl')} className={inputClass} />
+          <Label>{t('admin.logoUrl')}</Label>
+          <Input type="text" {...form.register('logoUrl')} />
         </div>
 
         <div className="flex items-center gap-3">

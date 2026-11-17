@@ -7,6 +7,7 @@ import type { CatalogSort } from '../types';
 import type { Product, ProductItem } from '../../../types';
 import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { Spinner } from '../../../components/ui/Spinner';
 
 const SORT_OPTIONS: CatalogSort[] = ['default', 'price-asc', 'price-desc', 'name'];
 
@@ -191,7 +192,7 @@ export default function ShopPage() {
             {/* Grid / states */}
             {loading ? (
               <div className="flex h-80 flex-col items-center justify-center gap-4">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+                <Spinner />
                 <p className="text-sm font-bold text-muted">{t('shop.loading')}</p>
               </div>
             ) : error ? (

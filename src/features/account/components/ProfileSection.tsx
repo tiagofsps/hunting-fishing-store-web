@@ -4,9 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from '../validation';
 import type { AuthUser } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
 
 interface ProfileSectionProps {
   user: AuthUser;
@@ -58,21 +57,21 @@ export default function ProfileSection({ user, isSaving, onSave }: ProfileSectio
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.email')}</label>
-          <input type="email" value={user.email} disabled className={`${inputClass} opacity-60`} />
+          <Label>{t('account.email')}</Label>
+          <Input type="email" value={user.email} disabled className="opacity-60" />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-bold text-ink">{t('account.firstName')}</label>
-            <input type="text" {...form.register('firstName')} className={inputClass} />
+            <Label>{t('account.firstName')}</Label>
+            <Input type="text" {...form.register('firstName')} />
             {form.formState.errors.firstName && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
             )}
           </div>
           <div>
-            <label className="mb-1 block text-xs font-bold text-ink">{t('account.lastName')}</label>
-            <input type="text" {...form.register('lastName')} className={inputClass} />
+            <Label>{t('account.lastName')}</Label>
+            <Input type="text" {...form.register('lastName')} />
             {form.formState.errors.lastName && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
             )}
@@ -80,24 +79,24 @@ export default function ProfileSection({ user, isSaving, onSave }: ProfileSectio
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">
+          <Label>
             {t('account.phone')} <span className="font-medium text-muted">({t('account.optional')})</span>
-          </label>
-          <input type="tel" {...form.register('phone')} className={inputClass} />
+          </Label>
+          <Input type="tel" {...form.register('phone')} />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-bold text-ink">
+            <Label>
               {t('account.huntingLicense')} <span className="font-medium text-muted">({t('account.optional')})</span>
-            </label>
-            <input type="text" {...form.register('huntingLicenseNumber')} className={inputClass} />
+            </Label>
+            <Input type="text" {...form.register('huntingLicenseNumber')} />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-bold text-ink">
+            <Label>
               {t('account.fishingLicense')} <span className="font-medium text-muted">({t('account.optional')})</span>
-            </label>
-            <input type="text" {...form.register('fishingLicenseNumber')} className={inputClass} />
+            </Label>
+            <Input type="text" {...form.register('fishingLicenseNumber')} />
           </div>
         </div>
 

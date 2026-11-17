@@ -8,6 +8,7 @@ import { useCart } from '../../cart/hooks';
 import { useOverlays } from '../../../components/overlay-context';
 import type { Product, ProductItem } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { Spinner } from '../../../components/ui/Spinner';
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ export default function HomePage() {
 
       {loading ? (
         <div className="flex h-96 flex-col items-center justify-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+          <Spinner />
           <p className="text-sm font-bold text-muted">{t('common.loading')}</p>
         </div>
       ) : error ? (

@@ -5,6 +5,7 @@ import { loginSchema, registerSchema, type LoginFormData, type RegisterFormData 
 import * as api from '../api';
 import { ApiError } from '../../../lib/apiClient';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { Input } from '../../../components/ui/Input';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -104,9 +105,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
     }
   };
 
-  const inputClass =
-    'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
@@ -152,12 +150,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
                   )}
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <input
+                    <Input
                       type="email"
                       required
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      className={inputClass}
                     />
                   </div>
                   <button
@@ -219,10 +216,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
                 <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <input
+                    <Input
                       type="email"
                       {...loginForm.register('email')}
-                      className={inputClass}
                     />
                     {loginForm.formState.errors.email && (
                       <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorInvalidEmail')}</p>
@@ -231,10 +227,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
 
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.password')}</label>
-                    <input
+                    <Input
                       type="password"
                       {...loginForm.register('password')}
-                      className={inputClass}
                     />
                     {loginForm.formState.errors.password && (
                       <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorPasswordRequired')}</p>
@@ -262,10 +257,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-xs font-bold text-ink mb-1">{t('auth.firstName')}</label>
-                      <input
+                      <Input
                         type="text"
                         {...registerForm.register('firstName')}
-                        className={inputClass}
                       />
                       {registerForm.formState.errors.firstName && (
                         <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorRequired')}</p>
@@ -273,10 +267,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-ink mb-1">{t('auth.lastName')}</label>
-                      <input
+                      <Input
                         type="text"
                         {...registerForm.register('lastName')}
-                        className={inputClass}
                       />
                       {registerForm.formState.errors.lastName && (
                         <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorRequired')}</p>
@@ -286,10 +279,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
 
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.email')}</label>
-                    <input
+                    <Input
                       type="email"
                       {...registerForm.register('email')}
-                      className={inputClass}
                     />
                     {registerForm.formState.errors.email && (
                       <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorInvalidEmail')}</p>
@@ -298,10 +290,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
 
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.password')}</label>
-                    <input
+                    <Input
                       type="password"
                       {...registerForm.register('password')}
-                      className={inputClass}
                     />
                     {registerForm.formState.errors.password && (
                       <p className="mt-1 text-[11px] font-bold text-sale">{t('auth.errorPasswordMin')}</p>
@@ -310,28 +301,25 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }: Auth
 
                   <div>
                     <label className="block text-xs font-bold text-ink mb-1">{t('auth.phone')}</label>
-                    <input
+                    <Input
                       type="tel"
                       {...registerForm.register('phone')}
-                      className={inputClass}
                     />
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-xs font-bold text-ink mb-1">{t('auth.huntingLicense')}</label>
-                      <input
+                      <Input
                         type="text"
                         {...registerForm.register('huntingLicenseNumber')}
-                        className={inputClass}
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-ink mb-1">{t('auth.fishingLicense')}</label>
-                      <input
+                      <Input
                         type="text"
                         {...registerForm.register('fishingLicenseNumber')}
-                        className={inputClass}
                       />
                     </div>
                   </div>

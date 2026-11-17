@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router';
 import { useAuth } from '../features/auth/hooks';
 import { useOverlays } from './overlay-context';
 import { useLanguage } from '../i18n/useLanguage';
+import { Spinner } from './ui/Spinner';
 
 export default function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { user, status } = useAuth();
@@ -17,7 +18,7 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+        <Spinner />
       </div>
     );
   }

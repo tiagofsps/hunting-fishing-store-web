@@ -7,11 +7,10 @@ import { createProduct, updateProduct, toAdminProductPayload } from '../api';
 import { getProductById, getCategories, getBrands } from '../../../lib/catalogApi';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const fieldClass = 'mb-1 block text-xs font-bold text-ink';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
+import { Textarea } from '../../../components/ui/Textarea';
 
 function parseAttributes(raw: string | undefined): Record<string, string> | undefined {
   if (!raw) return undefined;
@@ -189,17 +188,17 @@ export default function AdminProductFormPage() {
         <section className="space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className={fieldClass}>{t('admin.nameEn')}</label>
-              <input type="text" {...form.register('name')} className={inputClass} />
+              <Label>{t('admin.nameEn')}</Label>
+              <Input type="text" {...form.register('name')} />
               {errors.name && <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.errorTitle')}</p>}
             </div>
             <div>
-              <label className={fieldClass}>{t('admin.namePt')}</label>
-              <input type="text" {...form.register('namePt')} className={inputClass} />
+              <Label>{t('admin.namePt')}</Label>
+              <Input type="text" {...form.register('namePt')} />
             </div>
             <div>
-              <label className={fieldClass}>{t('admin.productSlug')}</label>
-              <input type="text" {...form.register('slug')} className={inputClass} />
+              <Label>{t('admin.productSlug')}</Label>
+              <Input type="text" {...form.register('slug')} />
               {errors.slug && (
                 <p className="mt-1 text-[11px] font-bold text-sale">
                   {errors.slug.message === 'slugInvalid' ? t('admin.slugInvalid') : t('admin.errorTitle')}
@@ -210,37 +209,37 @@ export default function AdminProductFormPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className={fieldClass}>{t('admin.productCategory')}</label>
-              <select {...form.register('categoryId', { valueAsNumber: true })} className={inputClass}>
+              <Label>{t('admin.productCategory')}</Label>
+              <Select {...form.register('categoryId', { valueAsNumber: true })}>
                 <option value={0}>{t('admin.selectPlaceholder')}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
-              <label className={fieldClass}>{t('admin.productBrand')}</label>
-              <select {...form.register('brandId', { valueAsNumber: true })} className={inputClass}>
+              <Label>{t('admin.productBrand')}</Label>
+              <Select {...form.register('brandId', { valueAsNumber: true })}>
                 <option value={0}>{t('admin.selectPlaceholder')}</option>
                 {brands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className={fieldClass}>{t('admin.descriptionEn')}</label>
-              <textarea rows={4} {...form.register('description')} className={inputClass} />
+              <Label>{t('admin.descriptionEn')}</Label>
+              <Textarea rows={4} {...form.register('description')} />
             </div>
             <div>
-              <label className={fieldClass}>{t('admin.descriptionPt')}</label>
-              <textarea rows={4} {...form.register('descriptionPt')} className={inputClass} />
+              <Label>{t('admin.descriptionPt')}</Label>
+              <Textarea rows={4} {...form.register('descriptionPt')} />
             </div>
           </div>
 
@@ -250,11 +249,11 @@ export default function AdminProductFormPage() {
               {t('admin.requiresLicense')}
             </label>
             {requiresLicense && (
-              <select {...form.register('licenseType')} className={`${inputClass} max-w-[12rem]`}>
+              <Select {...form.register('licenseType')} className="max-w-[12rem]">
                 <option value="">{t('admin.selectPlaceholder')}</option>
                 <option value="HUNTING">{t('admin.licenseHunting')}</option>
                 <option value="FISHING">{t('admin.licenseFishing')}</option>
-              </select>
+              </Select>
             )}
             {errors.licenseType && (
               <p className="text-[11px] font-bold text-sale">{t('admin.licenseTypeRequired')}</p>
@@ -285,26 +284,26 @@ export default function AdminProductFormPage() {
               <li key={field.id} className="rounded-2xl border border-border bg-surface-raised p-5">
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div>
-                    <label className={fieldClass}>{t('admin.sku')}</label>
-                    <input type="text" {...form.register(`items.${index}.sku`)} className={inputClass} />
+                    <Label>{t('admin.sku')}</Label>
+                    <Input type="text" {...form.register(`items.${index}.sku`)} />
                   </div>
                   <div>
-                    <label className={fieldClass}>{t('admin.price')}</label>
-                    <input type="number" step="0.01" {...form.register(`items.${index}.price`, { valueAsNumber: true })} className={inputClass} />
+                    <Label>{t('admin.price')}</Label>
+                    <Input type="number" step="0.01" {...form.register(`items.${index}.price`, { valueAsNumber: true })} />
                   </div>
                   <div>
-                    <label className={fieldClass}>{t('admin.stock')}</label>
-                    <input type="number" {...form.register(`items.${index}.stockQuantity`, { valueAsNumber: true })} className={inputClass} />
+                    <Label>{t('admin.stock')}</Label>
+                    <Input type="number" {...form.register(`items.${index}.stockQuantity`, { valueAsNumber: true })} />
                   </div>
                   <div>
-                    <label className={fieldClass}>{t('admin.weight')}</label>
-                    <input type="number" step="0.01" {...form.register(`items.${index}.weight`, { valueAsNumber: true })} className={inputClass} />
+                    <Label>{t('admin.weight')}</Label>
+                    <Input type="number" step="0.01" {...form.register(`items.${index}.weight`, { valueAsNumber: true })} />
                   </div>
                 </div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className={fieldClass}>{t('admin.attributes')}</label>
-                    <input
+                    <Label>{t('admin.attributes')}</Label>
+                    <Input
                       type="text"
                       value={rawAttributes[index] ?? ''}
                       onChange={(event) =>
@@ -314,7 +313,6 @@ export default function AdminProductFormPage() {
                           return next;
                         })
                       }
-                      className={inputClass}
                     />
                   </div>
                   <div className="flex items-end gap-4">
@@ -367,16 +365,16 @@ export default function AdminProductFormPage() {
               {imagesField.fields.map((field, index) => (
                 <li key={field.id} className="grid gap-4 rounded-2xl border border-border bg-surface-raised p-5 sm:grid-cols-4">
                   <div>
-                    <label className={fieldClass}>{t('admin.imageUrl')}</label>
-                    <input type="text" {...form.register(`images.${index}.imageUrl`)} className={inputClass} />
+                    <Label>{t('admin.imageUrl')}</Label>
+                    <Input type="text" {...form.register(`images.${index}.imageUrl`)} />
                   </div>
                   <div>
-                    <label className={fieldClass}>{t('admin.imageAlt')}</label>
-                    <input type="text" {...form.register(`images.${index}.altText`)} className={inputClass} />
+                    <Label>{t('admin.imageAlt')}</Label>
+                    <Input type="text" {...form.register(`images.${index}.altText`)} />
                   </div>
                   <div>
-                    <label className={fieldClass}>{t('admin.displayOrder')}</label>
-                    <input type="number" {...form.register(`images.${index}.displayOrder`, { valueAsNumber: true })} className={inputClass} />
+                    <Label>{t('admin.displayOrder')}</Label>
+                    <Input type="number" {...form.register(`images.${index}.displayOrder`, { valueAsNumber: true })} />
                   </div>
                   <div className="flex items-end gap-4">
                     <label className="flex items-center gap-2 text-xs font-bold text-ink">

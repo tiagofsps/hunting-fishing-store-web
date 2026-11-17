@@ -7,11 +7,10 @@ import { adminCategorySchema, type AdminCategoryFormData } from '../validation';
 import type { Category } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const fieldClass = 'mb-1 block text-xs font-bold text-ink';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
+import { Textarea } from '../../../components/ui/Textarea';
 
 function toPayload(data: AdminCategoryFormData): AdminCategoryPayload {
   return {
@@ -136,16 +135,16 @@ export default function AdminCategoriesPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className={fieldClass}>{t('admin.nameEn')}</label>
-            <input type="text" {...form.register('name')} className={inputClass} />
+            <Label>{t('admin.nameEn')}</Label>
+            <Input type="text" {...form.register('name')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.namePt')}</label>
-            <input type="text" {...form.register('namePt')} className={inputClass} />
+            <Label>{t('admin.namePt')}</Label>
+            <Input type="text" {...form.register('namePt')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.productSlug')}</label>
-            <input type="text" {...form.register('slug')} className={inputClass} />
+            <Label>{t('admin.productSlug')}</Label>
+            <Input type="text" {...form.register('slug')} />
             {form.formState.errors.slug && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.slugInvalid')}</p>
             )}
@@ -153,19 +152,18 @@ export default function AdminCategoriesPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={fieldClass}>{t('admin.descriptionEn')}</label>
-            <textarea rows={2} {...form.register('description')} className={inputClass} />
+            <Label>{t('admin.descriptionEn')}</Label>
+            <Textarea rows={2} {...form.register('description')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.descriptionPt')}</label>
-            <textarea rows={2} {...form.register('descriptionPt')} className={inputClass} />
+            <Label>{t('admin.descriptionPt')}</Label>
+            <Textarea rows={2} {...form.register('descriptionPt')} />
           </div>
         </div>
         <div>
-          <label className={fieldClass}>{t('admin.parentCategory')}</label>
-          <select
+          <Label>{t('admin.parentCategory')}</Label>
+          <Select
             {...form.register('parentCategoryId', { valueAsNumber: true })}
-            className={inputClass}
           >
             <option value={Number.NaN}>{t('admin.noParent')}</option>
             {categories
@@ -175,7 +173,7 @@ export default function AdminCategoriesPage() {
                   {category.name}
                 </option>
               ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex items-center gap-3">

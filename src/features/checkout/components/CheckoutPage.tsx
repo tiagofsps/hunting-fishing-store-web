@@ -13,15 +13,15 @@ import * as api from '../api';
 import { useCheckout } from '../hooks';
 import type { PaymentMethod } from '../types';
 import type { OrderResult } from '../../../lib/ordersApi';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
 
 /** Display-only estimate; the backend computes the authoritative order total. */
 const FREE_SHIPPING_THRESHOLD = 75;
 const SHIPPING_FEE = 4.95;
 
 type Step = 'address' | 'license' | 'payment' | 'review' | 'receipt';
-
-const INPUT_CLASS =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
 
 export default function CheckoutPage() {
   const { language, t } = useLanguage();
@@ -302,15 +302,15 @@ export default function CheckoutPage() {
                   <form onSubmit={addressForm.handleSubmit(handleSaveAddress)} className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.recipientName')} *</label>
-                        <input type="text" {...addressForm.register('recipientName')} className={INPUT_CLASS} />
+                        <Label>{t('checkout.recipientName')} *</Label>
+                        <Input type="text" {...addressForm.register('recipientName')} />
                         {addressForm.formState.errors.recipientName && (
                           <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
                         )}
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.recipientPhone')} *</label>
-                        <input type="tel" {...addressForm.register('recipientPhone')} className={INPUT_CLASS} />
+                        <Label>{t('checkout.recipientPhone')} *</Label>
+                        <Input type="tel" {...addressForm.register('recipientPhone')} />
                         {addressForm.formState.errors.recipientPhone && (
                           <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
                         )}
@@ -318,8 +318,8 @@ export default function CheckoutPage() {
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.address')} *</label>
-                      <input type="text" {...addressForm.register('street')} className={INPUT_CLASS} />
+                      <Label>{t('checkout.address')} *</Label>
+                      <Input type="text" {...addressForm.register('street')} />
                       {addressForm.formState.errors.street && (
                         <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
                       )}
@@ -327,22 +327,22 @@ export default function CheckoutPage() {
 
                     <div className="grid gap-4 sm:grid-cols-3">
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.postalCode')} *</label>
-                        <input type="text" placeholder="4000-000" {...addressForm.register('postalCode')} className={INPUT_CLASS} />
+                        <Label>{t('checkout.postalCode')} *</Label>
+                        <Input type="text" placeholder="4000-000" {...addressForm.register('postalCode')} />
                         {addressForm.formState.errors.postalCode && (
                           <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
                         )}
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.city')} *</label>
-                        <input type="text" {...addressForm.register('city')} className={INPUT_CLASS} />
+                        <Label>{t('checkout.city')} *</Label>
+                        <Input type="text" {...addressForm.register('city')} />
                         {addressForm.formState.errors.city && (
                           <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
                         )}
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.countryCode')} *</label>
-                        <input type="text" maxLength={2} placeholder="PT" {...addressForm.register('countryCode')} className={INPUT_CLASS} />
+                        <Label>{t('checkout.countryCode')} *</Label>
+                        <Input type="text" maxLength={2} placeholder="PT" {...addressForm.register('countryCode')} />
                         {addressForm.formState.errors.countryCode && (
                           <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorCountryCode')}</p>
                         )}
@@ -350,11 +350,11 @@ export default function CheckoutPage() {
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.addressType')}</label>
-                      <select {...addressForm.register('addressType')} className={INPUT_CLASS}>
+                      <Label>{t('checkout.addressType')}</Label>
+                      <Select {...addressForm.register('addressType')}>
                         <option value="SHIPPING">{t('checkout.shipping')}</option>
                         <option value="BILLING">{t('checkout.billing')}</option>
-                      </select>
+                      </Select>
                     </div>
 
                     <div className="mt-8 flex justify-between border-t border-border pt-4">
@@ -396,14 +396,14 @@ export default function CheckoutPage() {
                 <form onSubmit={licenseForm.handleSubmit(handleSaveLicense)} className="space-y-4">
                   {missingHunting && (
                     <div>
-                      <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.huntingLicense')}</label>
-                      <input type="text" {...licenseForm.register('huntingLicenseNumber')} className={INPUT_CLASS} />
+                      <Label>{t('checkout.huntingLicense')}</Label>
+                      <Input type="text" {...licenseForm.register('huntingLicenseNumber')} />
                     </div>
                   )}
                   {missingFishing && (
                     <div>
-                      <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.fishingLicense')}</label>
-                      <input type="text" {...licenseForm.register('fishingLicenseNumber')} className={INPUT_CLASS} />
+                      <Label>{t('checkout.fishingLicense')}</Label>
+                      <Input type="text" {...licenseForm.register('fishingLicenseNumber')} />
                     </div>
                   )}
 
@@ -462,13 +462,12 @@ export default function CheckoutPage() {
 
                 {paymentMethod === 'mbway' && (
                   <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
-                    <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.mbwayPhone')}</label>
-                    <input
+                    <Label>{t('checkout.mbwayPhone')}</Label>
+                    <Input
                       type="tel"
                       placeholder="910 000 000"
                       value={mbwayPhone}
                       onChange={(e) => setMbwayPhone(e.target.value)}
-                      className={INPUT_CLASS}
                     />
                   </div>
                 )}
@@ -521,14 +520,13 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="rounded-2xl border border-border bg-surface p-4">
-                  <label className="mb-1 block text-xs font-bold text-ink">{t('checkout.couponLabel')}</label>
+                  <Label>{t('checkout.couponLabel')}</Label>
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                       placeholder={t('checkout.couponPlaceholder')}
-                      className={INPUT_CLASS}
                     />
                   </div>
                   <p className="mt-2 text-[11px] text-muted">{t('checkout.couponHint')}</p>

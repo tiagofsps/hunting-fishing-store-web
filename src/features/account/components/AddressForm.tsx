@@ -3,12 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { accountAddressSchema, type AccountAddressFormData } from '../validation';
 import type { Address } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const selectClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
 
 interface AddressFormProps {
   address: Address | null;
@@ -40,47 +37,47 @@ export default function AddressForm({ address, isSaving, submitLabel, onSubmit, 
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-border bg-surface p-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.recipientName')}</label>
-          <input type="text" {...form.register('recipientName')} className={inputClass} />
+          <Label>{t('account.recipientName')}</Label>
+          <Input type="text" {...form.register('recipientName')} />
           {form.formState.errors.recipientName && required}
         </div>
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.recipientPhone')}</label>
-          <input type="tel" {...form.register('recipientPhone')} className={inputClass} />
+          <Label>{t('account.recipientPhone')}</Label>
+          <Input type="tel" {...form.register('recipientPhone')} />
           {form.formState.errors.recipientPhone && required}
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-ink">{t('account.street')}</label>
-        <input type="text" {...form.register('street')} className={inputClass} />
+        <Label>{t('account.street')}</Label>
+        <Input type="text" {...form.register('street')} />
         {form.formState.errors.street && required}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-1">
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.postalCode')}</label>
-          <input type="text" {...form.register('postalCode')} className={inputClass} />
+          <Label>{t('account.postalCode')}</Label>
+          <Input type="text" {...form.register('postalCode')} />
           {form.formState.errors.postalCode && required}
         </div>
         <div className="sm:col-span-1">
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.city')}</label>
-          <input type="text" {...form.register('city')} className={inputClass} />
+          <Label>{t('account.city')}</Label>
+          <Input type="text" {...form.register('city')} />
           {form.formState.errors.city && required}
         </div>
         <div className="sm:col-span-1">
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.countryCode')}</label>
-          <input type="text" maxLength={2} {...form.register('countryCode')} className={inputClass} />
+          <Label>{t('account.countryCode')}</Label>
+          <Input type="text" maxLength={2} {...form.register('countryCode')} />
           {form.formState.errors.countryCode && required}
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-ink">{t('account.addressType')}</label>
-        <select {...form.register('addressType')} className={selectClass}>
+        <Label>{t('account.addressType')}</Label>
+        <Select {...form.register('addressType')}>
           <option value="SHIPPING">{t('account.addressTypeShipping')}</option>
           <option value="BILLING">{t('account.addressTypeBilling')}</option>
-        </select>
+        </Select>
       </div>
 
       <div className="flex items-center gap-3 pt-1">

@@ -3,9 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { passwordSchema, type PasswordFormData } from '../validation';
 import { useLanguage } from '../../../i18n/useLanguage';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
 
 interface PasswordSectionProps {
   isSaving: boolean;
@@ -41,22 +40,22 @@ export default function PasswordSection({ isSaving, onChangePassword }: Password
 
       <form onSubmit={handleSubmit} className="mt-6 max-w-md space-y-5">
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.currentPassword')}</label>
-          <input type="password" autoComplete="current-password" {...form.register('currentPassword')} className={inputClass} />
+          <Label>{t('account.currentPassword')}</Label>
+          <Input type="password" autoComplete="current-password" {...form.register('currentPassword')} />
           {form.formState.errors.currentPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
           )}
         </div>
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.newPassword')}</label>
-          <input type="password" autoComplete="new-password" {...form.register('newPassword')} className={inputClass} />
+          <Label>{t('account.newPassword')}</Label>
+          <Input type="password" autoComplete="new-password" {...form.register('newPassword')} />
           {form.formState.errors.newPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
           )}
         </div>
         <div>
-          <label className="mb-1 block text-xs font-bold text-ink">{t('account.confirmPassword')}</label>
-          <input type="password" autoComplete="new-password" {...form.register('confirmPassword')} className={inputClass} />
+          <Label>{t('account.confirmPassword')}</Label>
+          <Input type="password" autoComplete="new-password" {...form.register('confirmPassword')} />
           {form.formState.errors.confirmPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">
               {form.formState.errors.confirmPassword.message === 'passwordsDoNotMatch'

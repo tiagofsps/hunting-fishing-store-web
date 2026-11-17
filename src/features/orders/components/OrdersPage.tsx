@@ -3,6 +3,7 @@ import { useOrders } from '../hooks';
 import { formatCurrency } from '../../../utils';
 import type { OrderStatus } from '../../../lib/ordersApi';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { Spinner } from '../../../components/ui/Spinner';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   PENDING: 'bg-accent/20 text-ink',
@@ -26,7 +27,7 @@ export default function OrdersPage() {
 
         {loading ? (
           <div className="flex h-80 flex-col items-center justify-center gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+            <Spinner />
             <p className="text-sm font-bold text-muted">{t('orders.loading')}</p>
           </div>
         ) : error ? (

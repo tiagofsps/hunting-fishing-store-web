@@ -6,6 +6,7 @@ import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import HomePage from './features/home-page/components/HomePage';
 import { useLanguage } from './i18n/useLanguage';
+import { Spinner } from './components/ui/Spinner';
 
 // Route-level code splitting keeps the initial bundle small; only the home
 // page and the shared layout are part of the eager chunk.
@@ -34,7 +35,7 @@ function RouteFallback() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+        <Spinner />
         <p className="text-sm font-bold text-muted">{t('common.loading')}</p>
       </div>
     </div>

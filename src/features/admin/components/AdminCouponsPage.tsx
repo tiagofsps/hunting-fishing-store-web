@@ -6,11 +6,9 @@ import { adminCouponSchema, type AdminCouponFormData } from '../validation';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const fieldClass = 'mb-1 block text-xs font-bold text-ink';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
 
 export default function AdminCouponsPage() {
   const { t } = useLanguage();
@@ -105,63 +103,59 @@ export default function AdminCouponsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className={fieldClass}>{t('admin.couponCode')}</label>
-            <input type="text" {...form.register('code')} className={inputClass} />
+            <Label>{t('admin.couponCode')}</Label>
+            <Input type="text" {...form.register('code')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.discountType')}</label>
-            <select {...form.register('discountType')} className={inputClass}>
+            <Label>{t('admin.discountType')}</Label>
+            <Select {...form.register('discountType')}>
               <option value="PERCENTAGE">{t('admin.discountPercentage')}</option>
               <option value="FIXED_AMOUNT">{t('admin.discountFixed')}</option>
-            </select>
+            </Select>
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.discountValue')}</label>
-            <input
+            <Label>{t('admin.discountValue')}</Label>
+            <Input
               type="number"
               step="0.01"
               {...form.register('discountValue', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className={fieldClass}>{t('admin.minOrderAmount')}</label>
-            <input
+            <Label>{t('admin.minOrderAmount')}</Label>
+            <Input
               type="number"
               step="0.01"
               {...form.register('minOrderAmount', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.usageLimit')}</label>
-            <input
+            <Label>{t('admin.usageLimit')}</Label>
+            <Input
               type="number"
               {...form.register('usageLimit', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.usageLimitPerUser')}</label>
-            <input
+            <Label>{t('admin.usageLimitPerUser')}</Label>
+            <Input
               type="number"
               {...form.register('usageLimitPerUser', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={fieldClass}>{t('admin.validFrom')}</label>
-            <input type="datetime-local" {...form.register('validFrom')} className={inputClass} />
+            <Label>{t('admin.validFrom')}</Label>
+            <Input type="datetime-local" {...form.register('validFrom')} />
           </div>
           <div>
-            <label className={fieldClass}>{t('admin.validTo')}</label>
-            <input type="datetime-local" {...form.register('validTo')} className={inputClass} />
+            <Label>{t('admin.validTo')}</Label>
+            <Input type="datetime-local" {...form.register('validTo')} />
           </div>
         </div>
 

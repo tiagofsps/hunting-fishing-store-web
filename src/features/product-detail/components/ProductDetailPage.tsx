@@ -6,6 +6,7 @@ import { useProductDetail } from '../hooks';
 import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency, getSalePrice, getSalePercentage, formatImageUrl } from '../../../utils';
 import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
+import { Spinner } from '../../../components/ui/Spinner';
 
 export default function ProductDetailPage() {
   const { language, t } = useLanguage();
@@ -25,7 +26,7 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-strong border-t-transparent"></div>
+        <Spinner />
         <p className="text-sm font-bold text-muted">{t('pdp.loading')}</p>
       </div>
     );

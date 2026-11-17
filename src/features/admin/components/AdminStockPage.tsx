@@ -6,11 +6,9 @@ import { createStockMovement, listStockMovements, type StockMovement } from '../
 import { stockMovementSchema, type StockMovementFormData } from '../validation';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
-
-const inputClass =
-  'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
-
-const fieldClass = 'mb-1 block text-xs font-bold text-ink';
+import { Input } from '../../../components/ui/Input';
+import { Label } from '../../../components/ui/Label';
+import { Select } from '../../../components/ui/Select';
 
 const MOVEMENT_LABELS: Record<StockMovementFormData['type'], string> = {
   PURCHASE: 'admin.movementPurchase',
@@ -131,15 +129,14 @@ export default function AdminStockPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
           <div>
-            <label className={fieldClass}>{t('admin.selectItem')}</label>
-            <select
+            <Label>{t('admin.selectItem')}</Label>
+            <Select
               value={selectedItemId ?? ''}
               onChange={(event) => {
                 setSelectedItemId(event.target.value ? Number(event.target.value) : null);
                 setNotice('');
                 setMovements([]);
               }}
-              className={inputClass}
             >
               <option value="">{t('admin.selectItem')}</option>
               {itemOptions.map((item) => (
@@ -147,36 +144,35 @@ export default function AdminStockPage() {
                   {item.sku} — {item.name} ({item.stock})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className={fieldClass}>{t('admin.quantity')}</label>
-              <input
+              <Label>{t('admin.quantity')}</Label>
+              <Input
                 type="number"
                 {...form.register('quantity', { valueAsNumber: true })}
-                className={inputClass}
               />
               {form.formState.errors.quantity && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.quantityRequired')}</p>
               )}
             </div>
             <div>
-              <label className={fieldClass}>{t('admin.movementType')}</label>
-              <select {...form.register('type')} className={inputClass}>
+              <Label>{t('admin.movementType')}</Label>
+              <Select {...form.register('type')}>
                 {Object.entries(MOVEMENT_LABELS).map(([value, key]) => (
                   <option key={value} value={value}>
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
           <div>
-            <label className={fieldClass}>{t('admin.notes')}</label>
-            <input type="text" {...form.register('notes')} className={inputClass} />
+            <Label>{t('admin.notes')}</Label>
+            <Input type="text" {...form.register('notes')} />
           </div>
 
           <button

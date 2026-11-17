@@ -251,6 +251,24 @@ export async function submitOrder(payload: OrderPayload, token?: string): Promis
 
 ---
 
+### `components/ui/` — the shared design primitives
+
+Form controls and loading indicators that every feature uses are in
+`src/components/ui/`: `Input`, `Select`, `Textarea`, `Label`, `Spinner`. They are
+atoms in the Atomic Design sense: they take props only, know nothing about the
+app's data, and compose no other components. Their Tailwind classes live in
+`ui/styles.ts`, so a change to the form look happens in one place.
+
+Why a `ui/` layer and not full Atomic Design folders: features remain the
+primary axis, because feature boundaries are what the rules above protect.
+Atoms are split out only where the same markup was copied across features (the
+same input class string appeared in about a dozen files). Molecules and
+organisms stay in `src/components/` or inside their feature, and templates and
+pages are not split into their own layers.
+
+Feature code imports from `components/ui/` freely; that is shared UI, not
+another feature, so the no-cross-feature rule does not apply.
+
 ### `components/`
 
 UI components exclusively used by this feature. Each file contains **exactly one exported component**.
