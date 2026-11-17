@@ -4,7 +4,7 @@ import ProductSection from './ProductSection';
 import BrandSection from './BrandSection';
 import CTASection from './CTASection';
 import { useHomeData } from '../hooks';
-import { useCart } from '../../cart/hooks';
+import { useCart } from '../../../providers/useCart';
 import { useOverlays } from '../../../components/overlay-context';
 import type { Product, ProductItem } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';

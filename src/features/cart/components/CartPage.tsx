@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router';
-import { useCart } from '../hooks';
-import { useAuth } from '../../auth/hooks';
+import { useCart } from '../../../providers/useCart';
+import { useAuth } from '../../../providers/useAuth';
 import { useOverlays } from '../../../components/overlay-context';
 import { formatCurrency, getProductImageUrl, getProductPrice } from '../../../utils';
 import { localizedText } from '../../../i18n/localizedContent';

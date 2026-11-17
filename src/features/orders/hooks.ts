@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { listUserOrders, getOrderByNumber, getPaymentForOrder, type OrderResponse, type PaymentResponse } from '../../lib/ordersApi';
-import { useAuth } from '../auth/hooks';
+import { useAuth } from '../../providers/useAuth';
 
 export function useOrders() {
   const { user } = useAuth();

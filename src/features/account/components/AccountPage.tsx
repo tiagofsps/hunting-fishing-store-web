@@ -4,7 +4,7 @@ import ProfileSection from './ProfileSection';
 import AddressesSection from './AddressesSection';
 import PasswordSection from './PasswordSection';
 import { useAccountMutations } from '../hooks';
-import { useAuth } from '../../auth/hooks';
+import { useAuth } from '../../../providers/useAuth';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 type Tab = 'profile' | 'addresses' | 'password';

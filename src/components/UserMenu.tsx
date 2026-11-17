@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLanguage } from '../i18n/useLanguage';
-import { useAuth } from '../features/auth/hooks';
+import { useAuth } from '../providers/useAuth';
 
 const itemClassName =
   'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-bold text-body outline-none transition-colors hover:bg-surface-hover hover:text-ink focus:bg-surface-hover focus:text-ink';

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import * as api from './api';
-import { getToken, setToken, clearToken } from '../../lib/apiClient';
-import { toAuthUser } from '../../utils';
-import type { AuthUser } from '../../types';
-import type { LoginFormData, RegisterFormData } from './validation';
-import { AuthContext, type AuthStatus } from './context';
+import * as api from '../features/auth/api';
+import { getToken, setToken, clearToken } from '../lib/apiClient';
+import { toAuthUser } from '../utils';
+import type { AuthUser } from '../types';
+import type { LoginFormData, RegisterFormData } from '../features/auth/validation';
+import { AuthContext, type AuthStatus } from './AuthContext';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);

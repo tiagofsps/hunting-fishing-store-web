@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import type { CartItem, Product, ProductItem } from '../../types';
-import { getProductPrice } from '../../utils';
-import * as api from './api';
-import { CartContext } from './context';
+import type { CartItem, Product, ProductItem } from '../types';
+import { getProductPrice } from '../utils';
+import * as api from '../features/cart/api';
+import { CartContext } from './CartContext';
 
 const STORAGE_KEY = 'cart_items';
 

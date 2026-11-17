@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import type { AuthUser } from '../../types';
-import type { LoginFormData, RegisterFormData } from './validation';
+import type { AuthUser } from '../types';
+import type { LoginFormData, RegisterFormData } from '../features/auth/validation';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'guest';
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ProductCard from '../../../components/ProductCard';
-import { useCart } from '../../cart/hooks';
+import { useCart } from '../../../providers/useCart';
 import { useOverlays } from '../../../components/overlay-context';
 import { useCatalog } from '../hooks';
 import type { CatalogSort } from '../types';

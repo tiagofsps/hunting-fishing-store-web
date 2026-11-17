@@ -17,7 +17,7 @@ The home page fetches `/api/v1/*` (products, categories, brands, promotions) on 
 
 Follow `docs/architecture/frontend-structure.md` for structure and conventions.
 
-- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features must not import each other; wire them together via `App.tsx` props/callbacks.
+- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features never import each other; `src/architecture.test.ts` enforces this. Shared session and cart state lives in `src/providers/`.
 - Shared UI lives in `src/components/`. Use PascalCase filenames (`CartDrawer.tsx`) for new files.
 - Shared domain types live in `src/types.ts`; shared helpers in `src/utils.ts`; the authenticated fetch wrapper in `src/lib/apiClient.ts`.
 

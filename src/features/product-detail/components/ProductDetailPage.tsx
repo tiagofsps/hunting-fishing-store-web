@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { useCart } from '../../cart/hooks';
+import { useCart } from '../../../providers/useCart';
 import { useOverlays } from '../../../components/overlay-context';
 import { useProductDetail } from '../hooks';
 import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency, getSalePrice, getSalePercentage, formatImageUrl } from '../../../utils';

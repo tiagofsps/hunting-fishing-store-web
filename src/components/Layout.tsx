@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
-import AuthProvider from '../features/auth/AuthProvider';
-import CartProvider from '../features/cart/CartProvider';
+import AuthProvider from '../providers/AuthProvider';
+import CartProvider from '../providers/CartProvider';
 import OverlayProvider from './OverlayProvider';
 import PromotionBanner from '../features/home-page/components/PromotionBanner';
 import Navbar from './navbar';
 import Footer from './footer';
-import { useAuth } from '../features/auth/hooks';
+import { useAuth } from '../providers/useAuth';
 
 function Shell() {
   const { user } = useAuth();

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router';
-import { useAuth } from '../features/auth/hooks';
+import { useAuth } from '../providers/useAuth';
 import { useOverlays } from './overlay-context';
 import { useLanguage } from '../i18n/useLanguage';
 import { Spinner } from './ui/Spinner';

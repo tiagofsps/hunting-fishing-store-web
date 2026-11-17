@@ -17,7 +17,9 @@ The home page fetches `/api/v1/*` (products, categories, brands, promotions) on 
 
 Follow `docs/architecture/frontend-structure.md` for structure and conventions.
 
-- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features must not import each other; wire them together via `App.tsx` props/callbacks. (Existing exception: `src/features/checkout/types.ts` imports `CartItem` from `../home-page/types`.)
+- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features never import each other; `src/architecture.test.ts` fails the build if they do.
+- Shared session and cart state lives in `src/providers/` (`AuthProvider`, `CartProvider`, `useAuth()`, `useCart()`). Features consume it from there. Providers may import a feature's `api`, `validation` and `types` modules only, never its components or hooks.
+- Shared domain types live in `src/types.ts`; shared UI in `src/components/` (form atoms in `src/components/ui/`).
 - Shared UI lives in `src/components/`. `navbar.tsx` and `footer.tsx` are legacy lowercase names; use PascalCase (`CartDrawer.tsx`) for new files.
 
 ## Conventions / gotchas

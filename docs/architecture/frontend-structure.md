@@ -22,6 +22,7 @@ src/
 │       ├── hooks.ts
 │       ├── utils.ts
 │       └── components/
+├── providers/           ← App-wide session and cart state (useAuth, useCart)
 ├── i18n/                ← Internationalisation (language context + locale files)
 │   ├── LanguageContext.tsx
 │   ├── translations.ts  ← Index aggregator
@@ -39,6 +40,22 @@ src/
 ## Global Layer
 
 Global files are for code that is **used by more than one feature** and does not belong to any single feature domain.
+
+### `src/providers/`
+
+State that every feature needs and that no single feature owns: the signed-in
+user (`AuthProvider`, `useAuth()`) and the hybrid guest/server cart
+(`CartProvider`, `useCart()`). `Layout.tsx` composes them around the routes.
+
+**Dependency rules (enforced by `src/architecture.test.ts`):**
+- A provider may import a feature's `api.ts`, `validation.ts` and `types.ts`.
+  It must not import a feature's components or hooks.
+- Features import `useAuth` and `useCart` from here. A feature never imports
+  another feature.
+
+Before this layer existed, `checkout`, `account`, `orders`, `cart`, `catalog`,
+`home-page` and `product-detail` imported the auth and cart hooks from each
+other's directories. Moving them here removed all nine cross-feature imports.
 
 ### `src/components/`
 

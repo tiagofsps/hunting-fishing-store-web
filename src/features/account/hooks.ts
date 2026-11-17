@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { AuthUser } from '../../types';
 import { toAuthUser } from '../../utils';
-import { useAuth } from '../auth/hooks';
+import { useAuth } from '../../providers/useAuth';
 import * as api from './api';
 import type { AccountAddressFormData, ProfileFormData } from './validation';
 

@@ -5,8 +5,8 @@ import { OverlayContext } from './overlay-context';
 import CartDrawer from './CartDrawer';
 import QuickViewModal from '../features/home-page/components/QuickViewModal';
 import AuthModal from '../features/auth/components/AuthModal';
-import { useCart } from '../features/cart/hooks';
-import { useAuth } from '../features/auth/hooks';
+import { useCart } from '../providers/useCart';
+import { useAuth } from '../providers/useAuth';
 
 export default function OverlayProvider({ children }: { children: React.ReactNode }) {
   const { cartItems, addToCart, updateQuantity, removeItem, clearCart } = useCart();
