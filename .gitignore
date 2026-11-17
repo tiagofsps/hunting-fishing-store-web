@@ -25,3 +25,6 @@ dist-ssr
 
 # AI tools
 .artifacts
+
+# Test coverage reports
+coverage/
