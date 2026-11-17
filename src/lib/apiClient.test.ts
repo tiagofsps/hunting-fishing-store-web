@@ -232,6 +232,36 @@ describe('apiFetchText', () => {
     expect(authorization).toBe('Bearer admin-token');
   });
 
+  it('refreshes an expired token and retries the export, like JSON requests', async () => {
+    setToken('expired');
+    let exportCalls = 0;
+    server.use(
+      http.get(`${API}/newsletter/export`, ({ request }) => {
+        exportCalls += 1;
+        if (request.headers.get('Authorization') === 'Bearer fresh') {
+          return new HttpResponse('email\nfresh@example.com\n');
+        }
+        return HttpResponse.json({ message: 'expired' }, { status: 401 });
+      }),
+      http.post(`${API}/auth/refresh`, () => HttpResponse.json({ accessToken: 'fresh' }))
+    );
+
+    await expect(apiFetchText(`${API}/newsletter/export`)).resolves.toBe('email\nfresh@example.com\n');
+    expect(exportCalls).toBe(2);
+    expect(getToken()).toBe('fresh');
+  });
+
+  it('clears a dead session and surfaces 401 when the export cannot be refreshed', async () => {
+    setToken('dead');
+    server.use(
+      http.get(`${API}/newsletter/export`, () => HttpResponse.json({}, { status: 401 })),
+      http.post(`${API}/auth/refresh`, () => HttpResponse.json({}, { status: 401 }))
+    );
+
+    await expect(apiFetchText(`${API}/newsletter/export`)).rejects.toMatchObject({ status: 401 });
+    expect(getToken()).toBeNull();
+  });
+
   it('throws an ApiError with the parsed server message on failure', async () => {
     server.use(
       http.get(`${API}/newsletter/export`, () => HttpResponse.json({ message: 'Forbidden' }, { status: 403 }))

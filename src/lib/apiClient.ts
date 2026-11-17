@@ -75,18 +75,26 @@ function extractErrorMessage(body: unknown, status: number): string {
   return `Request failed with status ${status}`;
 }
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+/** Builds the headers every API request carries: language, optional JSON type, and the Bearer token. */
+function buildHeaders(options: RequestInit, token: string | null): Headers {
   const headers = new Headers(options.headers);
   if (options.body !== undefined) {
     headers.set('Content-Type', 'application/json');
   }
   headers.set('Accept-Language', currentLanguage());
-  const token = getToken();
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
+  return headers;
+}
 
-  let response = await fetch(path, { ...options, headers });
+/**
+ * Sends a request and, on a 401, refreshes the access token once and retries.
+ * Shared by JSON and text responses so both recover from an expired session the
+ * same way. Login/register failures and anonymous catalog reads never refresh.
+ */
+async function sendAuthenticated(path: string, options: RequestInit): Promise<Response> {
+  let response = await fetch(path, { ...options, headers: buildHeaders(options, getToken()) });
 
   const isAuthAttempt = path.includes('/auth/login') || path.includes('/auth/register');
 
@@ -103,24 +111,28 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   if (response.status === 401 && !isAuthAttempt && !isPublicRead) {
     const newToken = await refreshAccessToken();
     if (newToken) {
-      const retryHeaders = new Headers(options.headers);
-      if (options.body !== undefined) {
-        retryHeaders.set('Content-Type', 'application/json');
-      }
-      retryHeaders.set('Accept-Language', currentLanguage());
-      retryHeaders.set('Authorization', `Bearer ${newToken}`);
-      response = await fetch(path, { ...options, headers: retryHeaders });
+      response = await fetch(path, { ...options, headers: buildHeaders(options, newToken) });
     }
   }
 
+  return response;
+}
+
+async function toApiError(response: Response): Promise<ApiError> {
+  let body: unknown = null;
+  try {
+    body = await response.json();
+  } catch {
+    // ignore parse errors
+  }
+  return new ApiError(response.status, extractErrorMessage(body, response.status));
+}
+
+export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const response = await sendAuthenticated(path, options);
+
   if (!response.ok) {
-    let body: unknown = null;
-    try {
-      body = await response.json();
-    } catch {
-      // ignore parse errors
-    }
-    throw new ApiError(response.status, extractErrorMessage(body, response.status));
+    throw await toApiError(response);
   }
 
   if (response.status === 204) {
@@ -129,24 +141,12 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   return (await response.json()) as T;
 }
 
-/** Fetches a plain-text response (for example CSV exports) with the same auth headers. */
+/** Fetches a plain-text response (for example CSV exports) with the same auth and refresh behaviour as `apiFetch`. */
 export async function apiFetchText(path: string, options: RequestInit = {}): Promise<string> {
-  const headers = new Headers(options.headers);
-  headers.set('Accept-Language', currentLanguage());
-  const token = getToken();
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
+  const response = await sendAuthenticated(path, options);
 
-  const response = await fetch(path, { ...options, headers });
   if (!response.ok) {
-    let body: unknown = null;
-    try {
-      body = await response.json();
-    } catch {
-      // ignore parse errors
-    }
-    throw new ApiError(response.status, extractErrorMessage(body, response.status));
+    throw await toApiError(response);
   }
   return response.text();
 }
