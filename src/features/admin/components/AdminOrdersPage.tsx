@@ -92,8 +92,8 @@ export default function AdminOrdersPage() {
       <div className="mt-6 flex flex-wrap gap-2">
         <button
           onClick={() => updateParams({ page: '0' })}
-          className={`rounded-lg border px-4 py-2 text-[10px] font-bold uppercase tracking-wider ${
-            statusFilter === '' ? 'border-accent-strong bg-accent-strong text-ink' : 'border-border text-muted'
+          className={`rounded-lg border px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+            statusFilter === '' ? 'border-ink bg-ink text-white shadow-sm' : 'border-border text-muted hover:text-ink'
           }`}
         >
           {t('admin.allStatuses')}
@@ -102,8 +102,8 @@ export default function AdminOrdersPage() {
           <button
             key={status}
             onClick={() => updateParams({ status, page: '0' })}
-            className={`rounded-lg border px-4 py-2 text-[10px] font-bold uppercase tracking-wider ${
-              statusFilter === status ? 'border-accent-strong bg-accent-strong text-ink' : 'border-border text-muted'
+            className={`rounded-lg border px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+              statusFilter === status ? 'border-ink bg-ink text-white shadow-sm' : 'border-border text-muted hover:text-ink'
             }`}
           >
             {t(`orders.status.${status}`)}

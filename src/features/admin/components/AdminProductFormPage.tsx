@@ -46,8 +46,10 @@ export default function AdminProductFormPage() {
     resolver: zodResolver(adminProductSchema),
     defaultValues: {
       name: '',
+      namePt: '',
       slug: '',
       description: '',
+      descriptionPt: '',
       requiresLicense: false,
       licenseType: undefined,
       categoryId: 0,
@@ -75,10 +77,14 @@ export default function AdminProductFormPage() {
         if (isEditing) {
           const product = await getProductById(Number(id));
           if (cancelled) return;
+          const english = product.translations?.en;
+          const portuguese = product.translations?.pt;
           form.reset({
-            name: product.name,
+            name: english?.name ?? product.name,
+            namePt: portuguese?.name ?? '',
             slug: product.slug ?? '',
-            description: product.description ?? '',
+            description: english?.description ?? product.description ?? '',
+            descriptionPt: portuguese?.description ?? '',
             requiresLicense: product.requiresLicense ?? false,
             licenseType: product.licenseType,
             categoryId: product.categoryId ?? 0,
@@ -181,11 +187,15 @@ export default function AdminProductFormPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-8">
         {/* Basics */}
         <section className="space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className={fieldClass}>{t('admin.productName')}</label>
+              <label className={fieldClass}>{t('admin.nameEn')}</label>
               <input type="text" {...form.register('name')} className={inputClass} />
               {errors.name && <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.errorTitle')}</p>}
+            </div>
+            <div>
+              <label className={fieldClass}>{t('admin.namePt')}</label>
+              <input type="text" {...form.register('namePt')} className={inputClass} />
             </div>
             <div>
               <label className={fieldClass}>{t('admin.productSlug')}</label>
@@ -223,9 +233,15 @@ export default function AdminProductFormPage() {
             </div>
           </div>
 
-          <div>
-            <label className={fieldClass}>{t('admin.productDescription')}</label>
-            <textarea rows={4} {...form.register('description')} className={inputClass} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={fieldClass}>{t('admin.descriptionEn')}</label>
+              <textarea rows={4} {...form.register('description')} className={inputClass} />
+            </div>
+            <div>
+              <label className={fieldClass}>{t('admin.descriptionPt')}</label>
+              <textarea rows={4} {...form.register('descriptionPt')} className={inputClass} />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-6">

@@ -18,6 +18,20 @@ function toPayload(data: AdminCategoryFormData): AdminCategoryPayload {
     name: data.name,
     slug: data.slug,
     ...(data.description ? { description: data.description } : {}),
+    translations: {
+      en: {
+        name: data.name,
+        ...(data.description ? { description: data.description } : {}),
+      },
+      ...(data.namePt
+        ? {
+            pt: {
+              name: data.namePt,
+              ...(data.descriptionPt ? { description: data.descriptionPt } : {}),
+            },
+          }
+        : {}),
+    },
     ...(data.parentCategoryId ? { parentCategoryId: data.parentCategoryId } : {}),
   };
 }
@@ -34,7 +48,7 @@ export default function AdminCategoriesPage() {
 
   const form = useForm<AdminCategoryFormData>({
     resolver: zodResolver(adminCategorySchema),
-    defaultValues: { name: '', slug: '', description: '', parentCategoryId: undefined },
+    defaultValues: { name: '', namePt: '', slug: '', description: '', descriptionPt: '', parentCategoryId: undefined },
   });
 
   useEffect(() => {
@@ -60,15 +74,19 @@ export default function AdminCategoriesPage() {
 
   const reset = () => {
     setEditingId(null);
-    form.reset({ name: '', slug: '', description: '', parentCategoryId: undefined });
+    form.reset({ name: '', namePt: '', slug: '', description: '', descriptionPt: '', parentCategoryId: undefined });
   };
 
   const startEdit = (category: Category) => {
     setEditingId(category.id);
+    const english = category.translations?.en;
+    const portuguese = category.translations?.pt;
     form.reset({
-      name: category.name,
+      name: english?.name ?? category.name,
+      namePt: portuguese?.name ?? '',
       slug: category.slug,
-      description: category.description ?? '',
+      description: english?.description ?? category.description ?? '',
+      descriptionPt: portuguese?.description ?? '',
       parentCategoryId: category.parentCategoryId ?? undefined,
     });
   };
@@ -116,10 +134,14 @@ export default function AdminCategoriesPage() {
       )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className={fieldClass}>{t('admin.productName')}</label>
+            <label className={fieldClass}>{t('admin.nameEn')}</label>
             <input type="text" {...form.register('name')} className={inputClass} />
+          </div>
+          <div>
+            <label className={fieldClass}>{t('admin.namePt')}</label>
+            <input type="text" {...form.register('namePt')} className={inputClass} />
           </div>
           <div>
             <label className={fieldClass}>{t('admin.productSlug')}</label>
@@ -129,9 +151,15 @@ export default function AdminCategoriesPage() {
             )}
           </div>
         </div>
-        <div>
-          <label className={fieldClass}>{t('admin.productDescription')}</label>
-          <textarea rows={2} {...form.register('description')} className={inputClass} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className={fieldClass}>{t('admin.descriptionEn')}</label>
+            <textarea rows={2} {...form.register('description')} className={inputClass} />
+          </div>
+          <div>
+            <label className={fieldClass}>{t('admin.descriptionPt')}</label>
+            <textarea rows={2} {...form.register('descriptionPt')} className={inputClass} />
+          </div>
         </div>
         <div>
           <label className={fieldClass}>{t('admin.parentCategory')}</label>
@@ -171,10 +199,11 @@ export default function AdminCategoriesPage() {
       </form>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-surface-raised">
-        <table className="w-full min-w-[560px] text-left text-xs">
+        <table className="w-full min-w-[720px] text-left text-xs">
           <thead className="border-b border-border text-[10px] uppercase tracking-widest text-muted">
             <tr>
-              <th className="px-5 py-3 font-bold">{t('admin.productName')}</th>
+              <th className="px-5 py-3 font-bold">{t('admin.nameEn')}</th>
+              <th className="px-5 py-3 font-bold">{t('admin.namePt')}</th>
               <th className="px-5 py-3 font-bold">{t('admin.productSlug')}</th>
               <th className="px-5 py-3 font-bold">{t('admin.parentCategory')}</th>
               <th className="px-5 py-3 font-bold">{t('admin.productsCount')}</th>
@@ -184,20 +213,23 @@ export default function AdminCategoriesPage() {
           <tbody className="divide-y divide-border">
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center font-bold text-muted">
+                <td colSpan={6} className="px-5 py-10 text-center font-bold text-muted">
                   {t('common.loading')}
                 </td>
               </tr>
             ) : categories.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center font-bold text-muted">
+                <td colSpan={6} className="px-5 py-10 text-center font-bold text-muted">
                   {t('shop.emptyTitle')}
                 </td>
               </tr>
             ) : (
               categories.map((category) => (
                 <tr key={category.id} className="hover:bg-surface-hover">
-                  <td className="px-5 py-3 font-bold text-ink">{category.name}</td>
+                  <td className="px-5 py-3 font-bold text-ink">
+                    {category.translations?.en?.name ?? category.name}
+                  </td>
+                  <td className="px-5 py-3 text-muted">{category.translations?.pt?.name || '—'}</td>
                   <td className="px-5 py-3 text-muted">{category.slug}</td>
                   <td className="px-5 py-3 text-muted">{parentName(category.parentCategoryId ?? undefined) ?? '—'}</td>
                   <td className="px-5 py-3 text-muted">{category.productCount ?? 0}</td>

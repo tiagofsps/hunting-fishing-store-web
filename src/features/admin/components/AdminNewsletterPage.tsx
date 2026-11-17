@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import {
+  deleteSubscription,
+  exportSubscriptionsCsv,
+  getNewsletterStats,
   listSubscriptions,
-  unsubscribe,
+  updateSubscriptionStatus,
   type NewsletterSubscription,
 } from '../api';
 import { useLanguage } from '../../../i18n/useLanguage';
@@ -9,12 +13,18 @@ import { useAdminError } from '../hooks';
 
 const PAGE_SIZE = 20;
 
+type StatusFilter = 'all' | 'active' | 'inactive';
+
 export default function AdminNewsletterPage() {
   const { t } = useLanguage();
   const describeError = useAdminError();
   const [subscriptions, setSubscriptions] = useState<NewsletterSubscription[]>([]);
   const [total, setTotal] = useState(0);
+  const [activeCount, setActiveCount] = useState<number | null>(null);
   const [page, setPage] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [appliedQuery, setAppliedQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -27,7 +37,11 @@ export default function AdminNewsletterPage() {
       try {
         setLoading(true);
         setError('');
-        const data = await listSubscriptions(page, PAGE_SIZE);
+        const active = statusFilter === 'all' ? undefined : statusFilter === 'active';
+        const data = await listSubscriptions(page, PAGE_SIZE, {
+          active,
+          q: appliedQuery || undefined,
+        });
         if (cancelled) return;
         setSubscriptions(data.content);
         setTotal(data.totalElements);
@@ -42,22 +56,99 @@ export default function AdminNewsletterPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, reloadToken, describeError]);
+  }, [page, statusFilter, appliedQuery, reloadToken, describeError]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getNewsletterStats()
+      .then((stats) => {
+        if (!cancelled) setActiveCount(stats.active);
+      })
+      .catch(() => {
+        // The count is non-critical; the table still renders.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadToken]);
+
+  const refresh = () => {
+    setReloadToken((token) => token + 1);
+  };
+
+  const submitSearch = (event: FormEvent) => {
+    event.preventDefault();
+    setPage(0);
+    setAppliedQuery(searchInput.trim());
+  };
+
+  const changeFilter = (filter: StatusFilter) => {
+    setPage(0);
+    setStatusFilter(filter);
+  };
 
   const handleUnsubscribe = async (subscription: NewsletterSubscription) => {
     if (!window.confirm(`${t('admin.unsubscribeConfirm')} ${subscription.email}`)) return;
     setError('');
     setNotice('');
     try {
-      await unsubscribe(subscription.email);
-      setNotice(t('admin.movementRecorded'));
-      setReloadToken((token) => token + 1);
+      await updateSubscriptionStatus(subscription.id, false);
+      setNotice(t('admin.newsletterUpdated'));
+      refresh();
+    } catch (err) {
+      setError(describeError(err));
+    }
+  };
+
+  const handleResubscribe = async (subscription: NewsletterSubscription) => {
+    if (!window.confirm(`${t('admin.resubscribeConfirm')} ${subscription.email}`)) return;
+    setError('');
+    setNotice('');
+    try {
+      await updateSubscriptionStatus(subscription.id, true);
+      setNotice(t('admin.newsletterUpdated'));
+      refresh();
+    } catch (err) {
+      setError(describeError(err));
+    }
+  };
+
+  const handleDelete = async (subscription: NewsletterSubscription) => {
+    if (!window.confirm(`${t('admin.deleteSubscriptionConfirm')} ${subscription.email}`)) return;
+    setError('');
+    setNotice('');
+    try {
+      await deleteSubscription(subscription.id);
+      setNotice(t('admin.newsletterDeleted'));
+      refresh();
+    } catch (err) {
+      setError(describeError(err));
+    }
+  };
+
+  const handleExport = async () => {
+    setError('');
+    setNotice('');
+    try {
+      const csv = await exportSubscriptionsCsv();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'newsletter-subscriptions.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      setNotice(t('admin.newsletterExported'));
     } catch (err) {
       setError(describeError(err));
     }
   };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const filterButtonClass = (filter: StatusFilter) =>
+    `rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${
+      statusFilter === filter ? 'bg-ink text-white' : 'text-muted hover:bg-surface-hover hover:text-ink'
+    }`;
 
   return (
     <div>
@@ -78,14 +169,53 @@ export default function AdminNewsletterPage() {
         </p>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-surface-raised">
-        <table className="w-full min-w-[520px] text-left text-xs">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="rounded-xl border border-border bg-surface-raised px-4 py-2 text-xs font-bold text-muted">
+          {t('admin.activeSubscribers')}: <span className="text-ink">{activeCount ?? '—'}</span>
+        </div>
+
+        <form onSubmit={submitSearch} className="flex h-10 flex-1 items-center gap-2 rounded-full border border-border bg-surface-raised px-4 text-muted focus-within:border-accent-border">
+          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder={t('admin.searchSubscriptions')}
+            className="min-w-0 flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-placeholder"
+          />
+        </form>
+
+        <div className="flex items-center gap-1 rounded-full border border-border bg-surface-raised p-1">
+          <button type="button" onClick={() => changeFilter('all')} className={filterButtonClass('all')}>
+            {t('admin.allSubscriptions')}
+          </button>
+          <button type="button" onClick={() => changeFilter('active')} className={filterButtonClass('active')}>
+            {t('admin.activeSubscriptions')}
+          </button>
+          <button type="button" onClick={() => changeFilter('inactive')} className={filterButtonClass('inactive')}>
+            {t('admin.inactiveSubscriptions')}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void handleExport()}
+          className="rounded-xl border border-border bg-surface-raised px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-ink hover:bg-surface-hover"
+        >
+          {t('admin.exportCsv')}
+        </button>
+      </div>
+
+      <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-surface-raised">
+        <table className="w-full min-w-[640px] text-left text-xs">
           <thead className="border-b border-border text-[10px] uppercase tracking-widest text-muted">
             <tr>
               <th className="px-5 py-3 font-bold">{t('admin.email')}</th>
               <th className="px-5 py-3 font-bold">{t('admin.subscribedAt')}</th>
               <th className="px-5 py-3 font-bold">{t('admin.active')}</th>
-              <th className="px-5 py-3 text-right font-bold">{t('admin.unsubscribe')}</th>
+              <th className="px-5 py-3 text-right font-bold">{t('admin.actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -114,16 +244,33 @@ export default function AdminNewsletterPage() {
                         subscription.active ? 'bg-accent-strong/15 text-accent-strong' : 'bg-sale/15 text-sale'
                       }`}
                     >
-                      {subscription.active ? t('admin.active') : t('admin.cancel')}
+                      {subscription.active ? t('admin.active') : t('admin.inactive')}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => void handleUnsubscribe(subscription)}
-                      className="rounded-lg border border-sale/40 bg-sale/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-sale hover:bg-sale/20"
-                    >
-                      {t('admin.unsubscribe')}
-                    </button>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      {subscription.active ? (
+                        <button
+                          onClick={() => void handleUnsubscribe(subscription)}
+                          className="rounded-lg border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-ink hover:bg-surface"
+                        >
+                          {t('admin.unsubscribe')}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => void handleResubscribe(subscription)}
+                          className="rounded-lg border border-accent-border bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-accent-strong hover:bg-accent/20"
+                        >
+                          {t('admin.resubscribe')}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => void handleDelete(subscription)}
+                        className="rounded-lg border border-sale/40 bg-sale/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-sale hover:bg-sale/20"
+                      >
+                        {t('admin.deleteSubscription')}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

@@ -95,7 +95,7 @@ export default function AdminProductsPage() {
         />
         <button
           type="submit"
-          className="shrink-0 rounded-xl bg-accent-strong px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink"
+          className="shrink-0 rounded-xl bg-ink px-5 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition-all hover:bg-ink/90"
         >
           {t('admin.search')}
         </button>

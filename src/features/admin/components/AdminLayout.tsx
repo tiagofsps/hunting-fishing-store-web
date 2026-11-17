@@ -19,7 +19,7 @@ export default function AdminLayout() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-      isActive ? 'bg-accent-strong text-ink' : 'text-muted hover:bg-surface-hover hover:text-ink'
+      isActive ? 'bg-ink text-white shadow-sm' : 'text-muted hover:bg-surface-hover hover:text-ink'
     }`;
 
   return (

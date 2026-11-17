@@ -1,4 +1,4 @@
-import { apiFetch } from '../../lib/apiClient';
+import { apiFetch, apiFetchText } from '../../lib/apiClient';
 import { mapProduct, type ProductResponse } from '../../lib/catalogApi';
 import type { Page, Product, UserResponse } from '../../types';
 import type { OrderResponse, OrderStatus } from '../../lib/ordersApi';
@@ -8,10 +8,21 @@ const USERS_URL = '/api/v1/users';
 const ORDERS_URL = '/api/v1/orders';
 const PRODUCTS_URL = '/api/v1/products';
 
+export interface AdminTranslationPayload {
+  name: string;
+  description?: string;
+}
+
+export interface AdminTranslationsPayload {
+  en?: AdminTranslationPayload;
+  pt?: AdminTranslationPayload;
+}
+
 export interface AdminProductPayload {
   name: string;
   slug: string;
   description?: string;
+  translations?: AdminTranslationsPayload;
   requiresLicense: boolean;
   licenseType?: 'HUNTING' | 'FISHING';
   categoryId: number;
@@ -38,6 +49,20 @@ export function toAdminProductPayload(data: AdminProductFormData): AdminProductP
     name: data.name,
     slug: data.slug,
     ...(data.description ? { description: data.description } : {}),
+    translations: {
+      en: {
+        name: data.name,
+        ...(data.description ? { description: data.description } : {}),
+      },
+      ...(data.namePt
+        ? {
+            pt: {
+              name: data.namePt,
+              ...(data.descriptionPt ? { description: data.descriptionPt } : {}),
+            },
+          }
+        : {}),
+    },
     requiresLicense: data.requiresLicense,
     ...(data.licenseType ? { licenseType: data.licenseType } : {}),
     categoryId: data.categoryId,
@@ -115,6 +140,7 @@ export interface AdminCategoryPayload {
   name: string;
   slug: string;
   description?: string;
+  translations?: AdminTranslationsPayload;
   parentCategoryId?: number;
 }
 
@@ -281,8 +307,38 @@ export interface NewsletterSubscription {
   subscribedAt: string;
 }
 
-export async function listSubscriptions(page: number, size: number): Promise<Page<NewsletterSubscription>> {
-  return apiFetch<Page<NewsletterSubscription>>(`${NEWSLETTER_URL}/subscriptions?page=${page}&size=${size}`);
+export interface NewsletterStats {
+  active: number;
+}
+
+export async function listSubscriptions(
+  page: number,
+  size: number,
+  filters: { active?: boolean; q?: string } = {}
+): Promise<Page<NewsletterSubscription>> {
+  const query = new URLSearchParams({ page: String(page), size: String(size) });
+  if (filters.active !== undefined) query.set('active', String(filters.active));
+  if (filters.q) query.set('q', filters.q);
+  return apiFetch<Page<NewsletterSubscription>>(`${NEWSLETTER_URL}/subscriptions?${query.toString()}`);
+}
+
+export async function getNewsletterStats(): Promise<NewsletterStats> {
+  return apiFetch<NewsletterStats>(`${NEWSLETTER_URL}/subscriptions/stats`);
+}
+
+export async function updateSubscriptionStatus(id: number, active: boolean): Promise<NewsletterSubscription> {
+  return apiFetch<NewsletterSubscription>(`${NEWSLETTER_URL}/subscriptions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ active }),
+  });
+}
+
+export async function deleteSubscription(id: number): Promise<void> {
+  await apiFetch<void>(`${NEWSLETTER_URL}/subscriptions/${id}`, { method: 'DELETE' });
+}
+
+export async function exportSubscriptionsCsv(): Promise<string> {
+  return apiFetchText(`${NEWSLETTER_URL}/subscriptions/export`);
 }
 
 export async function unsubscribe(email: string): Promise<void> {

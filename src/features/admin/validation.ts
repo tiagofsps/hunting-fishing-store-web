@@ -22,12 +22,14 @@ export type AdminProductImageFormData = z.infer<typeof adminProductImageSchema>;
 export const adminProductSchema = z
   .object({
     name: z.string().min(1).max(100),
+    namePt: z.string().max(100).optional(),
     slug: z
       .string()
       .min(1)
       .max(100)
       .regex(/^[a-z0-9-]+$/, 'slugInvalid'),
     description: z.string().max(2000).optional(),
+    descriptionPt: z.string().max(2000).optional(),
     requiresLicense: z.boolean(),
     licenseType: z.enum(['HUNTING', 'FISHING']).optional(),
     categoryId: z.number().int().positive(),
@@ -45,12 +47,14 @@ export type AdminProductFormData = z.infer<typeof adminProductSchema>;
 
 export const adminCategorySchema = z.object({
   name: z.string().min(1).max(100),
+  namePt: z.string().max(100).optional(),
   slug: z
     .string()
     .min(1)
     .max(100)
     .regex(/^[a-z0-9-]+$/, 'slugInvalid'),
   description: z.string().max(500).optional(),
+  descriptionPt: z.string().max(500).optional(),
   parentCategoryId: z.number().int().positive().optional(),
 });
 export type AdminCategoryFormData = z.infer<typeof adminCategorySchema>;
