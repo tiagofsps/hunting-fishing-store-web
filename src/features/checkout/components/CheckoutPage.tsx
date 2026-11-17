@@ -11,6 +11,7 @@ import { addressSchema, type AddressFormData } from '../validation';
 import * as api from '../api';
 import { useCheckout } from '../hooks';
 import type { CheckoutStep, PaymentMethod } from '../types';
+import { buildOrderItems, missingLicenses, shippingFeeFor } from '../utils';
 import type { OrderResult } from '../../../lib/ordersApi';
 import { AddressStep } from './AddressStep';
 import { LicenseStep, type LicenseFormValues } from './LicenseStep';
@@ -19,10 +20,6 @@ import { PaymentStep } from './PaymentStep';
 import { ReceiptStep } from './ReceiptStep';
 import { ReviewStep } from './ReviewStep';
 import { StepIndicator } from './StepIndicator';
-
-/** Display-only estimate; the backend computes the authoritative order total. */
-const FREE_SHIPPING_THRESHOLD = 75;
-const SHIPPING_FEE = 4.95;
 
 /**
  * Checkout container: owns the step state, forms and API calls, and renders one
@@ -65,22 +62,11 @@ export default function CheckoutPage() {
     },
   });
 
-  const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const shippingFee = shippingFeeFor(subtotal);
   const total = subtotal + shippingFee;
 
   const requiresLicense = cartItems.some((item) => item.product.requiresLicense);
-  const requiredLicenseTypes = new Set<'HUNTING' | 'FISHING'>();
-  cartItems.forEach((item) => {
-    if (!item.product.requiresLicense) return;
-    if (item.product.licenseType === 'HUNTING') requiredLicenseTypes.add('HUNTING');
-    else if (item.product.licenseType === 'FISHING') requiredLicenseTypes.add('FISHING');
-    else {
-      requiredLicenseTypes.add('HUNTING');
-      requiredLicenseTypes.add('FISHING');
-    }
-  });
-  const missingHunting = requiredLicenseTypes.has('HUNTING') && !user?.huntingLicenseNumber;
-  const missingFishing = requiredLicenseTypes.has('FISHING') && !user?.fishingLicenseNumber;
+  const { hunting: missingHunting, fishing: missingFishing } = missingLicenses(cartItems, user);
   const needsLicenseStep = missingHunting || missingFishing;
 
   if (!user) return null;
@@ -143,15 +129,8 @@ export default function CheckoutPage() {
     }
     setError('');
     // Build the order from the lines the user actually sees, so the placed
-    // order matches the summary. A line with no productItemId cannot be
-    // ordered; rather than silently dropping it (which would create an order
-    // missing items the customer paid for) or sending an empty array (which
-    // the backend rejects as an empty cart), omit `items` and let the backend
-    // fall back to the server cart.
-    const orderable = cartItems.flatMap((i) =>
-      i.selectedItem ? [{ productItemId: i.selectedItem.id, quantity: i.quantity }] : []
-    );
-    const items = cartItems.length > 0 && orderable.length === cartItems.length ? orderable : undefined;
+    // order matches the summary (see buildOrderItems for the fallback rule).
+    const items = buildOrderItems(cartItems);
     try {
       const result = await placeOrder({
         userId: user.id,
