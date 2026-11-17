@@ -16,11 +16,21 @@ export interface ProductImage {
   displayOrder?: number;
 }
 
+export type ContentLocale = 'en' | 'pt';
+
+export interface LocalizedText {
+  name: string;
+  description?: string | null;
+}
+
+type ContentTranslations = Partial<Record<ContentLocale, LocalizedText>>;
+
 export interface Product {
   id: number;
   name: string;
   slug?: string;
   description?: string;
+  translations?: ContentTranslations;
   requiresLicense?: boolean;
   licenseType?: 'HUNTING' | 'FISHING';
   categoryId?: number;
@@ -39,6 +49,7 @@ export interface Category {
   name: string;
   slug?: string;
   description?: string;
+  translations?: ContentTranslations;
   parentCategoryId?: number | null;
   productCount?: number;
 }

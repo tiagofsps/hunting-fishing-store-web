@@ -1,5 +1,5 @@
 import { apiFetch } from './apiClient';
-import type { Product, ProductItem, ProductImage, Category, Brand, Promotion, PromotionRule, Page } from '../types';
+import type { Product, ProductItem, ProductImage, Category, Brand, Promotion, PromotionRule, Page, LocalizedText } from '../types';
 
 const BASE_URL = '/api/v1';
 
@@ -30,6 +30,7 @@ export interface ProductResponse {
   name: string;
   slug: string;
   description: string;
+  translations: Record<string, LocalizedText> | null;
   requiresLicense: boolean;
   licenseType: 'HUNTING' | 'FISHING' | null;
   categoryId: number;
@@ -43,6 +44,7 @@ export interface CategoryResponse {
   name: string;
   slug: string;
   description: string;
+  translations: Record<string, LocalizedText> | null;
   parentCategoryId: number | null;
   productCount: number;
 }
@@ -85,6 +87,7 @@ export function mapProduct(response: ProductResponse): Product {
     name: response.name,
     slug: response.slug,
     description: response.description,
+    translations: response.translations ?? undefined,
     requiresLicense: response.requiresLicense,
     licenseType: response.licenseType ?? undefined,
     categoryId: response.categoryId,
@@ -118,6 +121,7 @@ function mapCategory(response: CategoryResponse): Category {
     name: response.name,
     slug: response.slug,
     description: response.description,
+    translations: response.translations ?? undefined,
     parentCategoryId: response.parentCategoryId,
     productCount: response.productCount,
   };

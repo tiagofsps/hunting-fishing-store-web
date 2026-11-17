@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import type { CartItem } from '../types';
 import { formatCurrency, getProductImageUrl, getProductPrice } from '../utils';
+import { localizedText } from '../i18n/localizedContent';
 import { useLanguage } from '../i18n/useLanguage';
 
 interface CartDrawerProps {
@@ -22,7 +23,7 @@ export default function CartDrawer({
   onClearCart,
   onOpenCheckout,
 }: CartDrawerProps) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   if (!isOpen) return null;
 
@@ -108,6 +109,7 @@ export default function CartDrawer({
                 const itemPrice = item.selectedItem ? item.selectedItem.price : getProductPrice(item.product);
                 const imageUrl = getProductImageUrl(item.product);
                 const sku = item.selectedItem?.sku;
+                const productText = localizedText(item.product, language);
 
                 return (
                   <div
@@ -116,14 +118,14 @@ export default function CartDrawer({
                   >
                     <img
                       src={imageUrl}
-                      alt={item.product.name}
+                      alt={productText.name}
                       className="h-20 w-20 rounded-xl object-cover border border-border bg-surface shrink-0"
                     />
 
                     <div className="flex-1 flex flex-col justify-between min-w-0">
                       <div>
                         <div className="flex justify-between items-start gap-2">
-                          <h3 className="text-xs font-bold text-ink line-clamp-1">{item.product.name}</h3>
+                          <h3 className="text-xs font-bold text-ink line-clamp-1">{productText.name}</h3>
                           <button
                             onClick={() => onRemoveItem(item.product.id, sku)}
                             className="text-muted hover:text-sale transition-colors p-1"

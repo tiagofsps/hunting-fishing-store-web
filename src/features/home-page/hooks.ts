@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import * as catalogApi from '../../lib/catalogApi';
 import type { Product, Category, Brand, Promotion } from '../../types';
+import { useLanguage } from '../../i18n/useLanguage';
 
 export function useHomeData() {
+  const { language } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -33,7 +35,7 @@ export function useHomeData() {
     }
 
     fetchData();
-  }, []);
+  }, [language]);
 
   return { products, categories, brands, promotions, loading, error };
 }

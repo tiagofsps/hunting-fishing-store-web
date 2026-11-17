@@ -1,7 +1,12 @@
 const TOKEN_KEY = 'access_token';
+const LANGUAGE_KEY = 'app_lang';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
+}
+
+function currentLanguage(): 'en' | 'pt' {
+  return localStorage.getItem(LANGUAGE_KEY) === 'pt' ? 'pt' : 'en';
 }
 
 export function setToken(token: string): void {
@@ -75,6 +80,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   if (options.body !== undefined) {
     headers.set('Content-Type', 'application/json');
   }
+  headers.set('Accept-Language', currentLanguage());
   const token = getToken();
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -101,6 +107,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
       if (options.body !== undefined) {
         retryHeaders.set('Content-Type', 'application/json');
       }
+      retryHeaders.set('Accept-Language', currentLanguage());
       retryHeaders.set('Authorization', `Bearer ${newToken}`);
       response = await fetch(path, { ...options, headers: retryHeaders });
     }
@@ -120,4 +127,26 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     return undefined as T;
   }
   return (await response.json()) as T;
+}
+
+/** Fetches a plain-text response (for example CSV exports) with the same auth headers. */
+export async function apiFetchText(path: string, options: RequestInit = {}): Promise<string> {
+  const headers = new Headers(options.headers);
+  headers.set('Accept-Language', currentLanguage());
+  const token = getToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(path, { ...options, headers });
+  if (!response.ok) {
+    let body: unknown = null;
+    try {
+      body = await response.json();
+    } catch {
+      // ignore parse errors
+    }
+    throw new ApiError(response.status, extractErrorMessage(body, response.status));
+  }
+  return response.text();
 }

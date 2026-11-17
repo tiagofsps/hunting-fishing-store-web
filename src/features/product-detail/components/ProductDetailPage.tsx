@@ -4,10 +4,11 @@ import { useCart } from '../../cart/hooks';
 import { useOverlays } from '../../../components/overlay-context';
 import { useProductDetail } from '../hooks';
 import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency, getSalePrice, getSalePercentage, formatImageUrl } from '../../../utils';
+import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 export default function ProductDetailPage() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { product, category, brand, promotions, loading, error, reload } = useProductDetail();
   const { addToCart } = useCart();
   const { openCartDrawer } = useOverlays();
@@ -64,6 +65,7 @@ export default function ProductDetailPage() {
   const activeImageIndex = Math.min(selectedImageIndex, Math.max(images.length - 1, 0));
   const displayPrice = selectedItem ? selectedItem.price : getProductPrice(product);
   const displayStock = selectedItem ? selectedItem.stockQuantity : getProductStock(product);
+  const productText = localizedText(product, language);
 
   const salePercentage = getSalePercentage(product, promotions);
   const basePrice = getProductPrice(product);
@@ -100,12 +102,12 @@ export default function ProductDetailPage() {
             <>
               <span aria-hidden="true">/</span>
               <Link to={`/shop?categoryId=${category.id}`} className="hover:text-accent-strong">
-                {category.name}
+                {localizedText(category, language).name}
               </Link>
             </>
           )}
           <span aria-hidden="true">/</span>
-          <span className="text-ink">{product.name}</span>
+          <span className="text-ink">{productText.name}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-2">
@@ -114,7 +116,7 @@ export default function ProductDetailPage() {
             <div className="relative aspect-square overflow-hidden rounded-3xl border border-border bg-surface-raised">
               <img
                 src={images[activeImageIndex] || getProductImageUrl(product)}
-                alt={product.name}
+                alt={productText.name}
                 className="h-full w-full object-cover"
               />
               {salePercentage > 0 && (
@@ -144,11 +146,11 @@ export default function ProductDetailPage() {
           {/* Info */}
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent-strong">
-              {category && <span>{category.name}</span>}
+              {category && <span>{localizedText(category, language).name}</span>}
               {brand && <span>· {brand.name}</span>}
             </div>
 
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-ink sm:text-4xl">{product.name}</h1>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-ink sm:text-4xl">{productText.name}</h1>
 
             <div className="mt-4 flex flex-wrap items-baseline gap-3">
               <span className={`text-3xl font-black ${salePrice !== null ? 'text-sale' : 'text-ink'}`}>
@@ -240,10 +242,10 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
-            {product.description && (
+            {productText.description && (
               <div className="mt-10">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-ink">{t('pdp.description')}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-body">{product.description}</p>
+                <p className="mt-3 text-sm leading-relaxed text-body">{productText.description}</p>
               </div>
             )}
 
@@ -259,7 +261,7 @@ export default function ProductDetailPage() {
                 {category && (
                   <div className="flex items-center justify-between px-4 py-3">
                     <dt className="font-bold text-muted">{t('pdp.detailCategory')}</dt>
-                    <dd className="font-bold text-ink">{category.name}</dd>
+                    <dd className="font-bold text-ink">{localizedText(category, language).name}</dd>
                   </div>
                 )}
                 {brand && (

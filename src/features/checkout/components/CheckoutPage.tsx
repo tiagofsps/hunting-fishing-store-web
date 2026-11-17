@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCart } from '../../cart/hooks';
 import { useAuth } from '../../auth/hooks';
 import { formatCurrency, getProductPrice, toAuthUser } from '../../../utils';
+import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { ApiError } from '../../../lib/apiClient';
 import { addressSchema, type AddressFormData } from '../validation';
@@ -23,7 +24,7 @@ const INPUT_CLASS =
   'w-full rounded-xl bg-surface px-4 py-3 text-xs border border-border outline-none focus:border-accent-strong text-ink font-medium';
 
 export default function CheckoutPage() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { user, updateUser } = useAuth();
   const { cartItems, clearCart, subtotal } = useCart();
   const { isPlacingOrder, placeOrder } = useCheckout();
@@ -172,10 +173,11 @@ export default function CheckoutPage() {
       <ul className="mt-4 max-h-64 space-y-3 overflow-y-auto">
         {cartItems.map((item) => {
           const price = item.selectedItem ? item.selectedItem.price : getProductPrice(item.product);
+          const productText = localizedText(item.product, language);
           return (
             <li key={`${item.product.id}-${item.selectedItem?.id ?? 'default'}`} className="flex justify-between gap-3 text-xs">
               <span className="font-bold text-ink">
-                {item.product.name} <span className="text-muted">x{item.quantity}</span>
+                {productText.name} <span className="text-muted">x{item.quantity}</span>
               </span>
               <span className="shrink-0 font-bold text-ink">{formatCurrency(price * item.quantity)}</span>
             </li>

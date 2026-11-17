@@ -5,6 +5,7 @@ import { useOverlays } from '../../../components/overlay-context';
 import { useCatalog } from '../hooks';
 import type { CatalogSort } from '../types';
 import type { Product, ProductItem } from '../../../types';
+import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 const SORT_OPTIONS: CatalogSort[] = ['default', 'price-asc', 'price-desc', 'name'];
@@ -17,7 +18,7 @@ function sortLabelKey(sort: CatalogSort): string {
 }
 
 export default function ShopPage() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { addToCart } = useCart();
   const { openCartDrawer, openQuickView } = useOverlays();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -76,7 +77,7 @@ export default function ShopPage() {
                   query.categoryId === category.id ? 'bg-ink text-white' : 'text-body hover:bg-surface-hover hover:text-ink'
                 }`}
               >
-                {category.name}
+                {localizedText(category, language).name}
               </button>
             </li>
           ))}

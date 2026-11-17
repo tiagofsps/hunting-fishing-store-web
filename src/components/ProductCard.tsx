@@ -8,6 +8,7 @@ import {
   getSalePercentage,
   getSalePrice,
 } from '../utils';
+import { localizedText } from '../i18n/localizedContent';
 import { useLanguage } from '../i18n/useLanguage';
 
 interface ProductCardProps {
@@ -18,7 +19,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, promotions = [], onAddToCart, onQuickView }: ProductCardProps) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const productText = localizedText(product, language);
 
   const price = getProductPrice(product);
   const imageUrl = getProductImageUrl(product);
@@ -31,10 +33,10 @@ export default function ProductCard({ product, promotions = [], onAddToCart, onQ
       <div>
         {/* Product Image Container */}
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-surface border border-border/50">
-          <Link to={`/product/${product.id}`} aria-label={product.name}>
+          <Link to={`/product/${product.id}`} aria-label={productText.name}>
             <img
               src={imageUrl}
-              alt={product.name}
+              alt={productText.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </Link>
@@ -87,11 +89,11 @@ export default function ProductCard({ product, promotions = [], onAddToCart, onQ
             to={`/product/${product.id}`}
             className="mt-1.5 block text-base font-bold text-ink group-hover:text-accent-strong transition-colors cursor-pointer line-clamp-1"
           >
-            {product.name}
+            {productText.name}
           </Link>
 
           <p className="mt-1 text-xs text-body line-clamp-2 leading-relaxed">
-            {product.description || t('prod.fallbackDescription')}
+            {productText.description || t('prod.fallbackDescription')}
           </p>
 
           <div className="mt-4 flex items-baseline justify-between gap-2">

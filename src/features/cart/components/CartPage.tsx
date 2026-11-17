@@ -3,6 +3,7 @@ import { useCart } from '../hooks';
 import { useAuth } from '../../auth/hooks';
 import { useOverlays } from '../../../components/overlay-context';
 import { formatCurrency, getProductImageUrl, getProductPrice } from '../../../utils';
+import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 /** Display-only estimate; the backend computes the authoritative order total. */
@@ -10,7 +11,7 @@ const FREE_SHIPPING_THRESHOLD = 75;
 const SHIPPING_FEE = 4.95;
 
 export default function CartPage() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { cartItems, updateQuantity, removeItem, clearCart, totalCount, subtotal } = useCart();
   const { user } = useAuth();
   const { openAuth } = useOverlays();
@@ -71,6 +72,7 @@ export default function CartPage() {
               const sku = item.selectedItem?.sku;
               const unitPrice = item.selectedItem ? item.selectedItem.price : getProductPrice(item.product);
               const availableStock = item.selectedItem?.stockQuantity ?? item.product.stockQuantity;
+              const productText = localizedText(item.product, language);
               return (
                 <li
                   key={`${item.product.id}-${sku ?? 'default'}`}
@@ -80,7 +82,7 @@ export default function CartPage() {
                     to={`/product/${item.product.id}`}
                     className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-surface"
                   >
-                    <img src={getProductImageUrl(item.product)} alt={item.product.name} className="h-full w-full object-cover" />
+                    <img src={getProductImageUrl(item.product)} alt={productText.name} className="h-full w-full object-cover" />
                   </Link>
 
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -90,7 +92,7 @@ export default function CartPage() {
                           to={`/product/${item.product.id}`}
                           className="block truncate text-sm font-bold text-ink hover:text-accent-strong"
                         >
-                          {item.product.name}
+                          {productText.name}
                         </Link>
                         {sku && (
                           <p className="mt-0.5 text-xs text-muted">

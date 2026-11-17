@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router';
 import * as catalogApi from '../../lib/catalogApi';
 import type { Product, Category, Brand, Promotion } from '../../types';
+import { useLanguage } from '../../i18n/useLanguage';
 
 export function useProductDetail() {
+  const { language } = useLanguage();
   const { id } = useParams();
   const productId = Number(id);
 
@@ -50,7 +52,7 @@ export function useProductDetail() {
     return () => {
       cancelled = true;
     };
-  }, [isValidId, productId, reloadToken]);
+  }, [isValidId, productId, language, reloadToken]);
 
   return {
     product: isValidId ? product : null,

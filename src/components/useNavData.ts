@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { localizedText } from '../i18n/localizedContent';
+import { useLanguage } from '../i18n/useLanguage';
 import * as catalogApi from '../lib/catalogApi';
 import { formatImageUrl } from '../utils';
 import type { NavLinkItem } from './NavDropdown';
@@ -9,6 +11,7 @@ import type { NavLinkItem } from './NavDropdown';
  * and brands as a flat list.
  */
 export function useNavData() {
+  const { language } = useLanguage();
   const [categories, setCategories] = useState<Awaited<ReturnType<typeof catalogApi.getCategories>>>([]);
   const [brands, setBrands] = useState<Awaited<ReturnType<typeof catalogApi.getBrands>>>([]);
 
@@ -34,7 +37,7 @@ export function useNavData() {
         category.id,
         {
           id: category.id,
-          label: category.name,
+          label: localizedText(category, language).name,
           to: `/shop?categoryId=${category.id}`,
           meta: category.productCount !== undefined ? String(category.productCount) : undefined,
           children: [],
@@ -54,7 +57,7 @@ export function useNavData() {
       else roots.push(item);
     }
     return roots;
-  }, [categories]);
+  }, [categories, language]);
 
   const brandLinks = useMemo<NavLinkItem[]>(
     () =>

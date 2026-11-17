@@ -4,6 +4,7 @@ import * as catalogApi from '../../lib/catalogApi';
 import { getProductPrice } from '../../utils';
 import type { Product, Category, Brand, Promotion, Page } from '../../types';
 import type { CatalogSort, ServerSort, SortDirection } from './types';
+import { useLanguage } from '../../i18n/useLanguage';
 
 export const CATALOG_PAGE_SIZE = 20;
 
@@ -35,6 +36,7 @@ function resolveServerSort(sort: CatalogSort): { sort: ServerSort; direction: So
 }
 
 export function useCatalog() {
+  const { language } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const q = searchParams.get('q') ?? '';
@@ -101,7 +103,7 @@ export function useCatalog() {
     return () => {
       cancelled = true;
     };
-  }, [page, categoryId, brandId, q, sort, reloadToken]);
+  }, [page, categoryId, brandId, q, sort, language, reloadToken]);
 
   const products = useMemo(() => {
     if (sort !== 'price-asc' && sort !== 'price-desc') return result.content;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Product, ProductItem } from '../../../types';
 import { getProductPrice, getProductImageUrl, getProductStock, formatCurrency } from '../../../utils';
+import { localizedText } from '../../../i18n/localizedContent';
 import { useLanguage } from '../../../i18n/useLanguage';
 
 interface QuickViewModalProps {
@@ -10,7 +11,7 @@ interface QuickViewModalProps {
 }
 
 export default function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModalProps) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedItemId, setSelectedItemId] = useState<number | undefined>(
@@ -20,6 +21,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
 
   if (!product) return null;
 
+  const productText = localizedText(product, language);
   const images = product.images && product.images.length > 0
     ? product.images.map((img) => img.imageUrl)
     : [getProductImageUrl(product)];
@@ -63,7 +65,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
               <div className="aspect-square w-full overflow-hidden rounded-2xl border border-border bg-surface relative">
                 <img
                   src={currentImage}
-                  alt={product.name}
+                  alt={productText.name}
                   className="h-full w-full object-cover"
                 />
                 {product.requiresLicense && (
@@ -107,9 +109,9 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                   )}
                 </div>
 
-                <h2 className="text-2xl font-black tracking-tight text-ink">{product.name}</h2>
+                <h2 className="text-2xl font-black tracking-tight text-ink">{productText.name}</h2>
                 <p className="mt-4 text-sm text-body leading-relaxed">
-                  {product.description || 'Pro gear for fishing and hunting with premium quality guarantee.'}
+                  {productText.description || t('prod.fallbackDescription')}
                 </p>
 
                 {/* Items/Variants Selection */}
