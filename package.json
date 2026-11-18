@@ -33,10 +33,10 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@tailwindcss/vite": "^4.3.3",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-hook-form": "^7.86.0",
-    "react-router": "^8.4.0",
+    "react-router": "^8.5.1",
     "tailwindcss": "^4.3.3",
     "zod": "^4.4.3"
   },
