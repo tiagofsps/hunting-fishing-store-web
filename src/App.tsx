@@ -35,7 +35,7 @@ function RouteFallback() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <Spinner />
+        <Spinner label={t('common.loading')} />
         <p className="text-sm font-bold text-muted">{t('common.loading')}</p>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { Input } from '../../../components/ui/Input';
@@ -27,6 +28,7 @@ export function LicenseStep({
   onBack,
 }: LicenseStepProps) {
   const { t } = useLanguage();
+  const id = useId();
 
   return (
     <div className="space-y-6">
@@ -43,14 +45,14 @@ export function LicenseStep({
       <form onSubmit={licenseForm.handleSubmit(onSave)} className="space-y-4">
         {missingHunting && (
           <div>
-            <Label>{t('checkout.huntingLicense')}</Label>
-            <Input type="text" {...licenseForm.register('huntingLicenseNumber')} />
+            <Label htmlFor={`${id}-huntingLicense`}>{t('checkout.huntingLicense')}</Label>
+            <Input id={`${id}-huntingLicense`} type="text" {...licenseForm.register('huntingLicenseNumber')} />
           </div>
         )}
         {missingFishing && (
           <div>
-            <Label>{t('checkout.fishingLicense')}</Label>
-            <Input type="text" {...licenseForm.register('fishingLicenseNumber')} />
+            <Label htmlFor={`${id}-fishingLicense`}>{t('checkout.fishingLicense')}</Label>
+            <Input id={`${id}-fishingLicense`} type="text" {...licenseForm.register('fishingLicenseNumber')} />
           </div>
         )}
 

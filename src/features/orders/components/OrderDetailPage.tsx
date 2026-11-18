@@ -35,7 +35,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
-        <Spinner />
+        <Spinner label={t('common.loading')} />
         <p className="text-sm font-bold text-muted">{t('orders.loading')}</p>
       </div>
     );

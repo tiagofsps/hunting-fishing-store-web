@@ -40,6 +40,8 @@ export default function CartProvider({
   const [cartItems, setCartItems] = useState<CartItem[]>(() =>
     userId === null ? loadLocalCart() : []
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadedUserId, setLoadedUserId] = useState<number | null>(null);
 
   // Load the right cart for the current scope: localStorage for guests, the
   // server cart (merged with any guest items) for logged-in users.
@@ -53,14 +55,21 @@ export default function CartProvider({
         // yields a clean empty guest cart.
         const items = loadLocalCart();
         await Promise.resolve();
-        if (!cancelled) setCartItems(items);
+        if (!cancelled) {
+          setCartItems(items);
+          setIsLoading(false);
+          setLoadedUserId(null);
+        }
         return;
       }
 
       // Logged-in scope: never show guest items as the user's cart while the
       // server cart loads.
       await Promise.resolve();
-      if (!cancelled) setCartItems([]);
+      if (!cancelled) {
+        setCartItems([]);
+        setIsLoading(true);
+      }
 
       try {
         const resp = await api.getCart(userId);
@@ -85,10 +94,16 @@ export default function CartProvider({
         if (cancelled) return;
         setCartItems(merged);
         localStorage.removeItem(CART_STORAGE_KEY);
+        setIsLoading(false);
+        setLoadedUserId(userId);
       } catch {
         // Server unreachable: leave the cart empty rather than showing stale
         // guest items as the user's cart.
-        if (!cancelled) setCartItems([]);
+        if (!cancelled) {
+          setCartItems([]);
+          setIsLoading(false);
+          setLoadedUserId(userId);
+        }
       }
     }
 
@@ -147,7 +162,16 @@ export default function CartProvider({
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, updateQuantity, removeItem, clearCart, totalCount, subtotal }}
+      value={{
+        cartItems,
+        isLoading: userId !== null && (isLoading || loadedUserId !== userId),
+        addToCart,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        totalCount,
+        subtotal,
+      }}
     >
       {children}
     </CartContext.Provider>

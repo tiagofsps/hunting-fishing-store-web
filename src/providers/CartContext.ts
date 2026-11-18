@@ -3,6 +3,7 @@ import type { CartItem, Product, ProductItem } from '../types';
 
 export interface CartContextValue {
   cartItems: CartItem[];
+  isLoading: boolean;
   addToCart: (product: Product, selectedItem?: ProductItem, quantity?: number) => void;
   updateQuantity: (productId: number, itemSku: string | undefined, delta: number) => void;
   removeItem: (productId: number, itemSku?: string) => void;

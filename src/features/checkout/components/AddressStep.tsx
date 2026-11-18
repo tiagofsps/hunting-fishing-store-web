@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useLanguage } from '../../../i18n/useLanguage';
 import type { Address } from '../../../types';
@@ -31,17 +32,27 @@ export function AddressStep({
   onContinue,
 }: AddressStepProps) {
   const { t } = useLanguage();
+  const id = useId();
 
   return (
     <div className="space-y-4">
       {addresses.length > 0 && !showAddressForm ? (
         <>
           <h3 className="text-sm font-bold text-ink">{t('checkout.selectAddress')}</h3>
-          <div className="space-y-3">
+          <div className="space-y-3" role="radiogroup" aria-label={t('checkout.selectAddress')}>
             {addresses.map((addr) => (
               <div
                 key={addr.id}
                 onClick={() => onSelectAddress(addr.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onSelectAddress(addr.id);
+                  }
+                }}
+                role="radio"
+                aria-checked={selectedAddressId === addr.id}
+                tabIndex={0}
                 className={`cursor-pointer rounded-2xl border p-4 transition-all ${
                   selectedAddressId === addr.id
                     ? 'border-accent-strong bg-accent/15 ring-2 ring-accent-strong'
@@ -87,15 +98,15 @@ export function AddressStep({
         <form onSubmit={addressForm.handleSubmit(onSaveAddress)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>{t('checkout.recipientName')} *</Label>
-              <Input type="text" {...addressForm.register('recipientName')} />
+              <Label htmlFor={`${id}-recipientName`}>{t('checkout.recipientName')} *</Label>
+              <Input id={`${id}-recipientName`} type="text" {...addressForm.register('recipientName')} />
               {addressForm.formState.errors.recipientName && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
               )}
             </div>
             <div>
-              <Label>{t('checkout.recipientPhone')} *</Label>
-              <Input type="tel" {...addressForm.register('recipientPhone')} />
+              <Label htmlFor={`${id}-recipientPhone`}>{t('checkout.recipientPhone')} *</Label>
+              <Input id={`${id}-recipientPhone`} type="tel" {...addressForm.register('recipientPhone')} />
               {addressForm.formState.errors.recipientPhone && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
               )}
@@ -103,8 +114,8 @@ export function AddressStep({
           </div>
 
           <div>
-            <Label>{t('checkout.address')} *</Label>
-            <Input type="text" {...addressForm.register('street')} />
+            <Label htmlFor={`${id}-street`}>{t('checkout.address')} *</Label>
+            <Input id={`${id}-street`} type="text" {...addressForm.register('street')} />
             {addressForm.formState.errors.street && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
             )}
@@ -112,22 +123,22 @@ export function AddressStep({
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <Label>{t('checkout.postalCode')} *</Label>
-              <Input type="text" placeholder="4000-000" {...addressForm.register('postalCode')} />
+              <Label htmlFor={`${id}-postalCode`}>{t('checkout.postalCode')} *</Label>
+              <Input id={`${id}-postalCode`} type="text" placeholder="4000-000" {...addressForm.register('postalCode')} />
               {addressForm.formState.errors.postalCode && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
               )}
             </div>
             <div>
-              <Label>{t('checkout.city')} *</Label>
-              <Input type="text" {...addressForm.register('city')} />
+              <Label htmlFor={`${id}-city`}>{t('checkout.city')} *</Label>
+              <Input id={`${id}-city`} type="text" {...addressForm.register('city')} />
               {addressForm.formState.errors.city && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorRequired')}</p>
               )}
             </div>
             <div>
-              <Label>{t('checkout.countryCode')} *</Label>
-              <Input type="text" maxLength={2} placeholder="PT" {...addressForm.register('countryCode')} />
+              <Label htmlFor={`${id}-countryCode`}>{t('checkout.countryCode')} *</Label>
+              <Input id={`${id}-countryCode`} type="text" maxLength={2} placeholder="PT" {...addressForm.register('countryCode')} />
               {addressForm.formState.errors.countryCode && (
                 <p className="mt-1 text-[11px] font-bold text-sale">{t('checkout.errorCountryCode')}</p>
               )}
@@ -135,8 +146,8 @@ export function AddressStep({
           </div>
 
           <div>
-            <Label>{t('checkout.addressType')}</Label>
-            <Select {...addressForm.register('addressType')}>
+            <Label htmlFor={`${id}-addressType`}>{t('checkout.addressType')}</Label>
+            <Select id={`${id}-addressType`} {...addressForm.register('addressType')}>
               <option value="SHIPPING">{t('checkout.shipping')}</option>
               <option value="BILLING">{t('checkout.billing')}</option>
             </Select>

@@ -60,7 +60,6 @@ export default function NavDropdown({ label, items }: NavDropdownProps) {
       className="relative"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
       }}
@@ -72,7 +71,9 @@ export default function NavDropdown({ label, items }: NavDropdownProps) {
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        // Hovering already opens the menu before a mouse click. Keep click
+        // idempotent rather than toggling it closed in the same interaction.
+        onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 text-[13px] font-bold tracking-wide text-body transition-colors hover:text-accent-strong"
       >
         {label}

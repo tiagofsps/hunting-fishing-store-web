@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { Input } from '../../../components/ui/Input';
 import { Label } from '../../../components/ui/Label';
@@ -29,15 +30,25 @@ export function PaymentStep({
   onNext,
 }: PaymentStepProps) {
   const { t } = useLanguage();
+  const id = useId();
 
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-bold text-ink">{t('checkout.paymentMethod')}</h3>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t('checkout.paymentMethod')}>
         {PAYMENT_METHODS.map(([method, labelKey, descKey]) => (
           <div
             key={method}
             onClick={() => onPaymentMethodChange(method)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onPaymentMethodChange(method);
+              }
+            }}
+            role="radio"
+            aria-checked={paymentMethod === method}
+            tabIndex={0}
             className={`cursor-pointer rounded-2xl border p-4 transition-all ${
               paymentMethod === method
                 ? 'border-accent-strong bg-accent/15 ring-2 ring-accent-strong'
@@ -57,8 +68,9 @@ export function PaymentStep({
 
       {paymentMethod === 'mbway' && (
         <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
-          <Label>{t('checkout.mbwayPhone')}</Label>
+          <Label htmlFor={`${id}-mbwayPhone`}>{t('checkout.mbwayPhone')}</Label>
           <Input
+            id={`${id}-mbwayPhone`}
             type="tel"
             placeholder="910 000 000"
             value={mbwayPhone}

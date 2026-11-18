@@ -70,6 +70,7 @@ export default function ProductCard({ product, promotions = [], onAddToCart, onQ
             onClick={() => onQuickView(product)}
             className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-ink shadow-md backdrop-blur-sm opacity-0 translate-y-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-ink hover:text-white"
             title={t('prod.quickView')}
+            aria-label={`${t('prod.quickView')}: ${productText.name}`}
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

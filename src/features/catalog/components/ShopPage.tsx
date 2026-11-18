@@ -192,7 +192,7 @@ export default function ShopPage() {
             {/* Grid / states */}
             {loading ? (
               <div className="flex h-80 flex-col items-center justify-center gap-4">
-                <Spinner />
+                <Spinner label={t('common.loading')} />
                 <p className="text-sm font-bold text-muted">{t('shop.loading')}</p>
               </div>
             ) : error ? (

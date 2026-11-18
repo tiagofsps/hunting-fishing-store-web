@@ -29,7 +29,7 @@ export default function HomePage() {
 
       {loading ? (
         <div className="flex h-96 flex-col items-center justify-center gap-4">
-          <Spinner />
+          <Spinner label={t('common.loading')} />
           <p className="text-sm font-bold text-muted">{t('common.loading')}</p>
         </div>
       ) : error ? (

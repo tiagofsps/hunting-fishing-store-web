@@ -18,7 +18,7 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
+        <Spinner label={t('common.loading')} />
       </div>
     );
   }

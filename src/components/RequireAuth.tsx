@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { useAuth } from '../providers/useAuth';
 import { useOverlays } from './overlay-context';
+import { useLanguage } from '../i18n/useLanguage';
 import { Spinner } from './ui/Spinner';
 
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
   const { status } = useAuth();
   const { openAuth } = useOverlays();
+  const { t } = useLanguage();
   const location = useLocation();
 
   const isGuest = status === 'guest';
@@ -18,7 +20,7 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
   if (status === 'loading') {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner label={t('common.loading')} />
       </div>
     );
   }

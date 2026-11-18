@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useLanguage } from '../../../i18n/useLanguage';
 import type { Address } from '../../../types';
 import { Input } from '../../../components/ui/Input';
@@ -25,6 +26,7 @@ export function ReviewStep({
   isPlacingOrder,
 }: ReviewStepProps) {
   const { t } = useLanguage();
+  const id = useId();
 
   return (
     <div className="space-y-6">
@@ -52,9 +54,10 @@ export function ReviewStep({
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-4">
-        <Label>{t('checkout.couponLabel')}</Label>
+        <Label htmlFor={`${id}-coupon`}>{t('checkout.couponLabel')}</Label>
         <div className="flex gap-2">
           <Input
+            id={`${id}-coupon`}
             type="text"
             value={couponCode}
             onChange={(e) => onCouponCodeChange(e.target.value.toUpperCase())}

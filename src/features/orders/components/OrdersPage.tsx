@@ -27,7 +27,7 @@ export default function OrdersPage() {
 
         {loading ? (
           <div className="flex h-80 flex-col items-center justify-center gap-4">
-            <Spinner />
+            <Spinner label={t('common.loading')} />
             <p className="text-sm font-bold text-muted">{t('orders.loading')}</p>
           </div>
         ) : error ? (

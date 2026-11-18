@@ -20,6 +20,7 @@ import { PaymentStep } from './PaymentStep';
 import { ReceiptStep } from './ReceiptStep';
 import { ReviewStep } from './ReviewStep';
 import { StepIndicator } from './StepIndicator';
+import { Spinner } from '../../../components/ui/Spinner';
 
 /**
  * Checkout container: owns the step state, forms and API calls, and renders one
@@ -28,7 +29,7 @@ import { StepIndicator } from './StepIndicator';
 export default function CheckoutPage() {
   const { t } = useLanguage();
   const { user, updateUser } = useAuth();
-  const { cartItems, clearCart, subtotal } = useCart();
+  const { cartItems, clearCart, subtotal, isLoading: isCartLoading } = useCart();
   const { isPlacingOrder, placeOrder } = useCheckout();
 
   const [step, setStep] = useState<CheckoutStep>('address');
@@ -41,6 +42,10 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [isSavingLicense, setIsSavingLicense] = useState(false);
+  // Auth restores asynchronously, so the first render may have no user yet.
+  // Derive the default from the loaded addresses instead of capturing null in
+  // the state initializer; an explicit selection still takes precedence.
+  const activeAddressId = selectedAddressId ?? user?.addresses[0]?.id ?? null;
 
   const addressForm = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
@@ -70,10 +75,17 @@ export default function CheckoutPage() {
   const needsLicenseStep = missingHunting || missingFishing;
 
   if (!user) return null;
+  if (isCartLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Spinner label={t('common.loading')} />
+      </div>
+    );
+  }
   // The backend rejects an empty cart with a 500, so guard before submitting.
   if (cartItems.length === 0 && step !== 'receipt') return <Navigate to="/cart" replace />;
 
-  const selectedAddress = user.addresses.find((a) => a.id === selectedAddressId);
+  const selectedAddress = user.addresses.find((a) => a.id === activeAddressId);
 
   const getErrorMessage = (err: unknown): string => {
     if (err instanceof ApiError) {
@@ -119,7 +131,7 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (selectedAddressId === null) {
+    if (activeAddressId === null) {
       setError(t('checkout.errorAddressRequired'));
       return;
     }
@@ -134,7 +146,7 @@ export default function CheckoutPage() {
     try {
       const result = await placeOrder({
         userId: user.id,
-        shippingAddressId: selectedAddressId,
+        shippingAddressId: activeAddressId,
         couponCode: couponCode.trim() || undefined,
         items,
         paymentMethod,
@@ -181,7 +193,7 @@ export default function CheckoutPage() {
             {step === 'address' && (
               <AddressStep
                 addresses={user.addresses}
-                selectedAddressId={selectedAddressId}
+                selectedAddressId={activeAddressId}
                 onSelectAddress={setSelectedAddressId}
                 showAddressForm={showAddressForm}
                 onShowAddressForm={setShowAddressForm}
