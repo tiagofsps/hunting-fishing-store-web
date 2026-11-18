@@ -216,7 +216,7 @@ export default function ProductDetailPage() {
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={safeQuantity <= 1 || displayStock === 0}
                   className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/5 text-ink disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="-"
+                  aria-label={t('cart.decreaseQuantity')}
                 >
                   −
                 </button>
@@ -225,7 +225,7 @@ export default function ProductDetailPage() {
                   onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
                   disabled={safeQuantity >= maxQuantity || displayStock === 0}
                   className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink/5 text-ink disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="+"
+                  aria-label={t('cart.increaseQuantity')}
                 >
                   +
                 </button>

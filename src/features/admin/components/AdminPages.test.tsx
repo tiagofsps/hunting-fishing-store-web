@@ -305,3 +305,169 @@ describe('Admin operations', () => {
     expect(await screen.findByText('Quantity cannot be zero')).toBeInTheDocument();
   });
 });
+
+describe('Admin pagination and error states', () => {
+  it('pages through the user list', async () => {
+    const requests = installAdminHandlers();
+    server.use(http.get('/api/v1/users', ({ request }) => {
+      const url = new URL(request.url);
+      requests.push({ method: 'GET', path: url.pathname, query: url.searchParams, body: undefined });
+      return HttpResponse.json(page([user], 60));
+    }));
+    const actor = userEvent.setup();
+    renderPage(<AdminUsersPage />);
+    await screen.findByText('ana@example.com');
+
+    expect(screen.getByRole('button', { name: /Previous/ })).toBeDisabled();
+    await actor.click(screen.getByRole('button', { name: /Next/ }));
+    await waitFor(() => expect(requests.some((r) => r.path === '/api/v1/users' && r.query.get('page') === '1')).toBe(true));
+  });
+
+  it('pages through admin orders and filters by status', async () => {
+    const requests = installAdminHandlers();
+    const actor = userEvent.setup();
+    renderPage(<AdminOrdersPage />);
+    await screen.findByText('ORD-17');
+
+    // The first "Paid" button is the status filter, above the order rows.
+    await actor.click(screen.getAllByRole('button', { name: 'Paid' })[0]);
+    await waitFor(() => expect(requests.some((r) => r.path === '/api/v1/orders' && r.query.get('status') === 'PAID')).toBe(true));
+  });
+
+  it('surfaces a load failure with a translated message', async () => {
+    server.use(http.get('/api/v1/products', () => HttpResponse.json({ message: 'Denied' }, { status: 403 })));
+    renderPage(<AdminProductsPage />);
+    expect(await screen.findByText(/permission to perform this action/)).toBeInTheDocument();
+  });
+});
+
+describe('Admin product deletion', () => {
+  it('asks for confirmation and deletes the product', async () => {
+    const requests = installAdminHandlers();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const actor = userEvent.setup();
+    renderPage(<AdminProductsPage />);
+    await screen.findByText('Carbon Rod');
+
+    await actor.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'DELETE' && r.path === '/api/v1/products/15')).toBe(true));
+  });
+
+  it('does nothing when the confirmation is declined', async () => {
+    const requests = installAdminHandlers();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const actor = userEvent.setup();
+    renderPage(<AdminProductsPage />);
+    await screen.findByText('Carbon Rod');
+
+    await actor.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(requests.some((r) => r.method === 'DELETE')).toBe(false);
+  });
+});
+
+describe('Admin newsletter actions', () => {
+  it('exports the subscriber list as CSV', async () => {
+    installAdminHandlers();
+    // jsdom has no object-URL support; add just those two methods so the
+    // global URL constructor (used by the request layer) keeps working.
+    const createObjectURL = vi.fn(() => 'blob:csv');
+    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true, writable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true, writable: true });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    const actor = userEvent.setup();
+    renderPage(<AdminNewsletterPage />);
+    await screen.findByText('fan@example.com');
+
+    await actor.click(screen.getByRole('button', { name: 'Export CSV' }));
+
+    expect(await screen.findByText('CSV exported.')).toBeInTheDocument();
+    expect(createObjectURL).toHaveBeenCalledOnce();
+    expect(clickSpy).toHaveBeenCalledOnce();
+  });
+
+  it('resubscribes an inactive subscriber', async () => {
+    const requests = installAdminHandlers();
+    server.use(http.get('/api/v1/newsletter/subscriptions', () => HttpResponse.json(page([{ ...subscription, active: false }], 1))));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const actor = userEvent.setup();
+    renderPage(<AdminNewsletterPage />);
+    await screen.findByText('fan@example.com');
+
+    await actor.click(screen.getByRole('button', { name: 'Resubscribe' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'PATCH' && r.path === '/api/v1/newsletter/subscriptions/31')).toBe(true));
+    expect(await screen.findByText('Subscription updated.')).toBeInTheDocument();
+  });
+
+  it('deletes a subscriber after confirmation', async () => {
+    const requests = installAdminHandlers();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const actor = userEvent.setup();
+    renderPage(<AdminNewsletterPage />);
+    await screen.findByText('fan@example.com');
+
+    await actor.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'DELETE' && r.path === '/api/v1/newsletter/subscriptions/31')).toBe(true));
+    expect(await screen.findByText('Subscription deleted.')).toBeInTheDocument();
+  });
+
+  it('shows an error when the subscriber list cannot load', async () => {
+    installAdminHandlers();
+    server.use(http.get('/api/v1/newsletter/subscriptions', () => HttpResponse.json({ message: 'Unavailable' }, { status: 503 })));
+    renderPage(<AdminNewsletterPage />);
+    expect(await screen.findByText(/Unavailable/)).toBeInTheDocument();
+  });
+});
+
+describe('Admin category actions', () => {
+  it('edits an existing category and cancels the edit', async () => {
+    const requests = installAdminHandlers();
+    const actor = userEvent.setup();
+    renderPage(<AdminCategoriesPage />);
+    await screen.findByRole('button', { name: 'Edit' });
+
+    await actor.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByLabelText('Name (EN)')).toHaveValue('Rods');
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+
+    await actor.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.getByLabelText('Name (EN)')).toHaveValue('');
+
+    await actor.click(screen.getByRole('button', { name: 'Edit' }));
+    await actor.clear(screen.getByLabelText('Name (EN)'));
+    await actor.type(screen.getByLabelText('Name (EN)'), 'Rods Pro');
+    await actor.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(requests.some((r) => r.method === 'PUT' && r.path === '/api/v1/categories/3')).toBe(true));
+  });
+
+  it('deletes a category after confirmation', async () => {
+    const requests = installAdminHandlers();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const actor = userEvent.setup();
+    renderPage(<AdminCategoriesPage />);
+    await screen.findByRole('button', { name: 'Delete' });
+
+    await actor.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'DELETE' && r.path === '/api/v1/categories/3')).toBe(true));
+  });
+});
+
+describe('Admin brand actions', () => {
+  it('edits and deletes a brand', async () => {
+    const requests = installAdminHandlers();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const actor = userEvent.setup();
+    renderPage(<AdminBrandsPage />);
+    await screen.findByText('Acme');
+
+    await actor.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByLabelText('Name')).toHaveValue('Acme');
+    await actor.clear(screen.getByLabelText('Name'));
+    await actor.type(screen.getByLabelText('Name'), 'Acme Pro');
+    await actor.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'PUT' && r.path === '/api/v1/brands/7')).toBe(true));
+
+    await actor.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(requests.some((r) => r.method === 'DELETE' && r.path === '/api/v1/brands/7')).toBe(true));
+  });
+});

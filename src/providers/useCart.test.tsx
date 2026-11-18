@@ -125,3 +125,72 @@ describe('useCart server behavior', () => {
     expect(result.current.totalCount).toBe(0);
   });
 });
+
+describe('useCart server mutations', () => {
+  it('pushes quantity changes and removals to the server and clears through the API', async () => {
+    const existing = {
+      id: 1,
+      productItemId: 24,
+      productId: 15,
+      productName: 'Rod',
+      imageUrl: null,
+      sku: 'ROD-1',
+      unitPrice: 10,
+      stockQuantity: 10,
+      quantity: 2,
+      requiresLicense: false,
+      licenseType: null,
+    };
+    const calls: string[] = [];
+    server.use(
+      http.get('/api/v1/carts/22', () => HttpResponse.json({ items: [existing] })),
+      http.put('/api/v1/carts/22/items/24', ({ request }) => {
+        calls.push(`PUT ${new URL(request.url).searchParams.get('quantity')}`);
+        return HttpResponse.json({ items: [existing] });
+      }),
+      http.delete('/api/v1/carts/22/items/24', () => {
+        calls.push('DELETE item');
+        return HttpResponse.json({ items: [] });
+      }),
+      http.delete('/api/v1/carts/22', () => {
+        calls.push('DELETE cart');
+        return new HttpResponse(null, { status: 204 });
+      })
+    );
+
+    const { result } = renderHook(() => useCart(), { wrapper: wrapper(22) });
+    await waitFor(() => expect(result.current.cartItems).toHaveLength(1));
+
+    act(() => result.current.updateQuantity(15, 'ROD-1', 1));
+    act(() => result.current.addToCart(product, product.items?.[0], 1));
+    act(() => result.current.removeItem(15, 'ROD-1'));
+    act(() => result.current.clearCart());
+
+    await waitFor(() => expect(calls).toContain('DELETE cart'));
+    expect(calls).toContain('PUT 3');
+    expect(calls).toContain('DELETE item');
+    expect(result.current.cartItems).toEqual([]);
+  });
+
+  it('decrements to zero by removing the line on the server', async () => {
+    const existing = {
+      id: 1, productItemId: 24, productId: 15, productName: 'Rod', imageUrl: null,
+      sku: 'ROD-1', unitPrice: 10, stockQuantity: 10, quantity: 1, requiresLicense: false, licenseType: null,
+    };
+    const calls: string[] = [];
+    server.use(
+      http.get('/api/v1/carts/22', () => HttpResponse.json({ items: [existing] })),
+      http.delete('/api/v1/carts/22/items/24', () => {
+        calls.push('DELETE item');
+        return HttpResponse.json({ items: [] });
+      })
+    );
+    const { result } = renderHook(() => useCart(), { wrapper: wrapper(22) });
+    await waitFor(() => expect(result.current.cartItems).toHaveLength(1));
+
+    act(() => result.current.updateQuantity(15, 'ROD-1', -1));
+
+    await waitFor(() => expect(calls).toContain('DELETE item'));
+    expect(result.current.cartItems).toEqual([]);
+  });
+});

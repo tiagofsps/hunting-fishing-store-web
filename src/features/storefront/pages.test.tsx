@@ -119,3 +119,68 @@ describe('ProductDetailPage', () => {
     expect(await screen.findByText('Product not found')).toBeInTheDocument();
   });
 });
+
+describe('ProductDetailPage edge cases', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('app_lang', 'en');
+  });
+
+  it('shows the sale price, gallery, licence notice and resolved category and brand', async () => {
+    server.use(
+      http.get('/api/v1/products/15', () => HttpResponse.json({
+        ...product,
+        requiresLicense: true,
+        licenseType: 'HUNTING',
+        images: [
+          { id: 31, imageUrl: '/images/front.jpg', altText: 'Front', isPrimary: true, displayOrder: 0 },
+          { id: 32, imageUrl: '/images/side.jpg', altText: 'Side', isPrimary: false, displayOrder: 1 },
+        ],
+        items: [
+          { id: 24, sku: 'ROD-S', price: 50, stockQuantity: 3, weight: 0.4, active: true, attributes: { size: 'S' } },
+          { id: 25, sku: 'ROD-L', price: 60, stockQuantity: 0, weight: 0.6, active: true, attributes: { size: 'L' } },
+        ],
+      })),
+      http.get('/api/v1/products', () => HttpResponse.json(productPage)),
+      http.get('/api/v1/categories', () => HttpResponse.json([{ id: 3, name: 'Rods', slug: 'rods', description: '', translations: null, parentCategoryId: null, productCount: 1 }])),
+      http.get('/api/v1/brands', () => HttpResponse.json([{ id: 7, name: 'Acme', slug: 'acme', logoUrl: '' }])),
+      http.get('/api/v1/promotions', () => HttpResponse.json([{ id: 1, name: 'Sale', discountType: 'PERCENTAGE', discountValue: 10, priority: 1, stackable: false, validFrom: '2026-01-01', validTo: '2026-12-31', active: true, rules: [{ id: 1, targetType: 'PRODUCT', targetId: 15 }] }]))
+    );
+    const actor = userEvent.setup();
+    renderStore('/product/15', '/product/:id', <ProductDetailPage />);
+
+    expect(await screen.findByRole('heading', { name: 'Carbon Rod' })).toBeInTheDocument();
+    expect(screen.getAllByText('Rods').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Acme/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/-10%/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/licen[cs]e/i)).toBeInTheDocument();
+
+    await actor.click(screen.getByRole('button', { name: 'Product gallery 2' }));
+    expect(screen.getByAltText('Carbon Rod')).toHaveAttribute('src', '/images/side.jpg');
+
+    await actor.click(screen.getByRole('button', { name: /ROD-L/ }));
+    expect(screen.getByRole('button', { name: /Sold out|Add to cart/i })).toBeDisabled();
+  });
+
+  it('keeps quantity within stock limits', async () => {
+    server.use(
+      http.get('/api/v1/products/15', () => HttpResponse.json({ ...product, items: [{ id: 24, sku: 'ROD-1', price: 50, stockQuantity: 2, weight: null, active: true, attributes: {} }] })),
+      http.get('/api/v1/products', () => HttpResponse.json(productPage)),
+      http.get('/api/v1/categories', () => HttpResponse.json([])),
+      http.get('/api/v1/brands', () => HttpResponse.json([])),
+      http.get('/api/v1/promotions', () => HttpResponse.json([]))
+    );
+    const actor = userEvent.setup();
+    renderStore('/product/15', '/product/:id', <ProductDetailPage />);
+    await screen.findByRole('heading', { name: 'Carbon Rod' });
+
+    const increase = screen.getByRole('button', { name: 'Increase quantity' });
+    const decrease = screen.getByRole('button', { name: 'Decrease quantity' });
+    expect(decrease).toBeDisabled();
+    await actor.click(increase);
+    await actor.click(increase);
+    expect(increase).toBeDisabled();
+    await actor.click(decrease);
+    expect(screen.getByText('1')).toBeInTheDocument();
+  });
+});
