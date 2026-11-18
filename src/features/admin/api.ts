@@ -120,9 +120,15 @@ export async function listOrdersByStatus(
   return apiFetch<Page<OrderResponse>>(`${ORDERS_URL}?page=${page}&size=${size}&status=${status}`);
 }
 
+/**
+ * Transitions an order's status. The backend exposes this as
+ * `PATCH /orders/{orderNumber}/status?status=...`; a plain GET on the order
+ * path returns the order unchanged, so the method and path must both be right.
+ */
 export async function updateOrderStatus(orderNumber: string, status: OrderStatus): Promise<OrderResponse> {
   return apiFetch<OrderResponse>(
-    `${ORDERS_URL}/${encodeURIComponent(orderNumber)}?status=${status}`
+    `${ORDERS_URL}/${encodeURIComponent(orderNumber)}/status?status=${status}`,
+    { method: 'PATCH' }
   );
 }
 
