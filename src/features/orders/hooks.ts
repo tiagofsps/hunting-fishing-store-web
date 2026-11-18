@@ -37,7 +37,12 @@ export function useOrders() {
     };
   }, [user, reloadToken]);
 
-  return { orders, loading, error, reload };
+  return {
+    orders: user ? orders : [],
+    loading: user ? loading : false,
+    error: user ? error : null,
+    reload,
+  };
 }
 
 export function useOrderDetail() {
@@ -77,5 +82,11 @@ export function useOrderDetail() {
     };
   }, [orderNumber, reloadToken]);
 
-  return { order, payment, loading, error, reload };
+  return {
+    order: orderNumber ? order : null,
+    payment: orderNumber ? payment : null,
+    loading: orderNumber ? loading : false,
+    error: orderNumber ? error : null,
+    reload,
+  };
 }
