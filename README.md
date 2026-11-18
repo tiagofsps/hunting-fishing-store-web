@@ -1,36 +1,181 @@
-# Wild Life — Hunting & Fishing Store (Web Frontend)
+# Wild Life — Hunting & Fishing Store
 
-Storefront SPA for the Hunting & Fishing Store: React 19 + TypeScript + Vite, Tailwind CSS v4, feature-driven architecture. The backend is a separate Spring Boot REST service.
+[![CI](https://github.com/tiagofsps/hunting-fishing-store-web/actions/workflows/ci.yml/badge.svg)](https://github.com/tiagofsps/hunting-fishing-store-web/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-414%20passing-brightgreen)
 
-## Commands (pnpm only)
+**Wild Life** is the storefront for the Hunting & Fishing Store: a React single-page
+app for a regulated sporting-goods retailer. It covers the whole customer journey —
+catalog, cart, checkout with licence verification, payments, account and order
+history — plus a complete admin console.
 
-- `pnpm dev` — Vite dev server; proxies `/api`, `/images`, `/brands`, `/uploads`, `/static` to `http://localhost:8080`
-- `pnpm build` — `tsc -b && vite build` (typecheck is part of build)
-- `pnpm lint` — `eslint .`
-- No test framework is configured; do not add or run tests.
+It is a **proprietary portfolio project**, published so reviewers can read the code.
+The API lives in a separate repository,
+[hunting-fishing-store](https://github.com/tiagofsps/hunting-fishing-store).
 
-## Backend requirement
+![Storefront home page](docs/images/storefront-home.png)
 
-The home page fetches `/api/v1/*` (products, categories, brands, promotions) on mount. Without a backend at `localhost:8080` the app renders an error state — a missing backend is not a frontend bug.
+## About this project
 
-## Architecture
+Hunting and fishing gear is regulated: some products require a licence, some ship
+with legal notices, and prices change with promotions and coupons. The app has to
+be honest about all of that while staying fast and pleasant to use.
 
-Follow `docs/architecture/frontend-structure.md` for structure and conventions.
+What is interesting here, beyond the usual storefront work:
 
-- `src/features/<kebab-case>/` owns `types.ts`, `validation.ts`, `hooks.ts`, `utils.ts`, `api.ts`, and `components/`. Features never import each other; `src/architecture.test.ts` enforces this. Shared session and cart state lives in `src/providers/`.
-- Shared UI lives in `src/components/`. Use PascalCase filenames (`CartDrawer.tsx`) for new files.
-- Shared domain types live in `src/types.ts`; shared helpers in `src/utils.ts`; the authenticated fetch wrapper in `src/lib/apiClient.ts`.
+- **Licence enforcement at checkout.** A cart containing regulated items collects
+  the missing hunting or fishing licence before payment, and the UI explains why.
+- **Bilingual content, not just bilingual chrome.** The interface is English and
+  Portuguese, and product and category text is translated per locale with the
+  canonical value as fallback.
+- **A hybrid cart.** Guests get a local cart; signing in merges it into the server
+  cart exactly once, with server quantities winning.
+- **An admin console that mirrors the backend rules.** Order transitions are
+  limited to the states the API allows, and the forms send only the fields the
+  backend validates as optional.
 
-## Conventions / gotchas
-
-- `tsconfig.app.json` sets `verbatimModuleSyntax`: type-only imports must use `import type`. `erasableSyntaxOnly`: no enums or namespaces — use union types / const objects.
-- All UI text goes through `useLanguage().t('feature.key')`. Each feature with UI text has a locale file `src/i18n/locales/<feature>.ts` exporting both `en` and `pt`, registered in `src/i18n/translations.ts`. No new hardcoded user-facing strings.
-- Forms use react-hook-form + zod (v4) + @hookform/resolvers. Schemas live in the feature's `validation.ts`, exporting the schema and its `z.infer` type suffixed `FormData`.
-- Tailwind v4 theme tokens are defined via `@theme` in `src/index.css`. Use the semantic tokens (`bg-surface`, `text-ink`, `border-accent-strong`, `text-sale`, …) instead of raw palette colors.
+Scope: frontend only. There is no server-side rendering, no native app and no
+payment SDK — payments redirect to the URL the API returns.
 
 ## Features
 
-- **Home page** — catalog (products, categories, brands, promotions) fetched from `/api/v1`, search + category filtering, quick view modal, newsletter signup.
-- **Auth** — login / register / forgot password against `/api/v1/auth`, session restored from the access token, refresh handled by `apiClient`.
-- **Cart** — hybrid cart: localStorage for guests, best-effort server sync (`/api/v1/carts`) when logged in.
-- **Checkout** — requires login; address selection/creation, license verification for regulated items, payment initiation (MB WAY / Multibanco / Credit Card / Klarna) against `/api/v1/orders` and `/api/v1/payments`.
+| Area | What it does |
+|---|---|
+| Home | Hero, featured carousel, brand strip, newsletter signup, quick view |
+| Catalog | Search, category and brand filters, sorting, pagination, product detail with variants and stock state |
+| Auth | Sign in, registration, password reset, session restore, user menu |
+| Cart | Guest cart in `localStorage`, server sync when signed in, free-shipping progress |
+| Checkout | Address selection or creation, licence collection, payment method, coupon, receipt with instructions |
+| Account | Profile, address book, password change |
+| Orders | History and a detail view with payment instructions |
+| Admin | Dashboard, products, categories, brands, stock movements, orders, coupons, promotions, newsletter, users |
+
+![Shop page with filters](docs/images/storefront-shop.png)
+
+## Architecture
+
+```mermaid
+flowchart TB
+  subgraph app[App shell]
+    Layout[Layout]
+    Navbar[Navbar / Footer / UserMenu]
+    Overlays[OverlayProvider<br/>cart drawer, auth modal, quick view]
+  end
+  subgraph providers[src/providers — app-wide state]
+    Auth[AuthProvider / useAuth]
+    Cart[CartProvider / useCart]
+  end
+  subgraph features[src/features — feature modules]
+    Home[home-page]
+    Catalog[catalog]
+    Detail[product-detail]
+    CartF[cart]
+    Checkout[checkout]
+    Account[account]
+    Orders[orders]
+    Admin[admin]
+  end
+  subgraph shared[Shared]
+    UI[components/ui atoms]
+    Api[lib/apiClient]
+    I18n[i18n]
+  end
+  Layout --> Navbar
+  Layout --> Overlays
+  Layout --> Auth
+  Auth --> Cart
+  Cart --> Features
+  features --> Api
+  features --> UI
+  features --> I18n
+```
+
+Rules, enforced by `src/architecture.test.ts`:
+
+- a **feature never imports another feature**;
+- app-wide session and cart state lives in `src/providers/`, which may import a
+  feature's `api`, `validation` and `types` modules only;
+- shared UI lives in `src/components/` (form atoms in `components/ui/`).
+
+See [docs/architecture/frontend-structure.md](docs/architecture/frontend-structure.md)
+for the full conventions.
+
+## Tech stack
+
+| Concern | Choice |
+|---|---|
+| UI | React 19, React Router 8 |
+| Language | TypeScript 6 (`verbatimModuleSyntax`, `erasableSyntaxOnly`) |
+| Build | Vite 8 |
+| Styling | Tailwind CSS v4 with semantic theme tokens |
+| Forms | react-hook-form + zod 4 |
+| State | React context in `src/providers/` |
+| Tests | Vitest 5, Testing Library, MSW |
+
+## Quickstart
+
+The app needs the API. Start the backend first:
+
+```bash
+git clone git@github.com:tiagofsps/hunting-fishing-store.git
+cd hunting-fishing-store
+docker compose up -d            # PostgreSQL + Redis
+./mvnw spring-boot:run          # API on http://localhost:8080, seeds demo data
+```
+
+Then the storefront:
+
+```bash
+git clone git@github.com:tiagofsps/hunting-fishing-store-web.git
+cd hunting-fishing-store-web
+pnpm install
+pnpm dev                        # http://localhost:5173
+```
+
+The dev server proxies `/api`, `/images`, `/brands`, `/uploads` and `/static` to
+`http://localhost:8080`, so there is no CORS setup to do.
+
+### Demo accounts
+
+Seeded by the backend on an empty database:
+
+| Account | Email | Password |
+|---|---|---|
+| Admin | `admin@huntingfishing.com` | `Password123!` |
+| Shopper | `user@huntingfishing.com` | `Password123!` |
+
+Sign in as the admin and open `/admin` for the console.
+
+## Testing
+
+```bash
+pnpm test            # 414 tests
+pnpm test:coverage   # enforces 90% lines/statements and 80% branches
+pnpm typecheck
+pnpm lint
+```
+
+Coverage at the 1.0.0 snapshot: **93.6% lines, 91.2% statements, 81.3% branches,
+87.9% functions**.
+
+The suite is layered: pure units and schemas, API contract tests that assert the
+method, path and body of every request, hook and provider behaviour, component
+tests driven by user events, and a few routed flows through the real providers.
+HTTP is mocked with MSW, so no backend is needed.
+
+See [docs/testing.md](docs/testing.md) for the harness and conventions.
+
+## Documentation
+
+- [Frontend structure and conventions](docs/architecture/frontend-structure.md)
+- [Testing guide](docs/testing.md)
+- [Changelog](CHANGELOG.md)
+
+## License / Usage
+
+This repository is **not open source**. It is published for portfolio and review
+purposes only; no permission is granted to use, copy, modify or distribute the
+code without written permission. See [LICENSE](LICENSE) and
+[SECURITY.md](SECURITY.md).

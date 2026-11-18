@@ -1,7 +1,24 @@
 {
-  "name": "hunting-fishing-store-web",
+  "name": "wild-life-storefront",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
+  "description": "Wild Life \u2014 Hunting & Fishing Store storefront (React 19 + TypeScript + Vite)",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Tiago Pires",
+    "email": "tiagofsantospires@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tiagofsps/hunting-fishing-store-web.git"
+  },
+  "homepage": "https://github.com/tiagofsps/hunting-fishing-store-web#readme",
+  "bugs": {
+    "url": "https://github.com/tiagofsps/hunting-fishing-store-web/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
