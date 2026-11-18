@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-This is a proprietary portfolio project. Please **do not open a public issue**
+This is a training and portfolio project. Please **do not open a public issue**
 for security problems.
 
 Report vulnerabilities privately to **tiagofsantospires@gmail.com** with:
@@ -23,5 +23,4 @@ amount of time to investigate and fix the issue before any public disclosure.
   development convenient. They are not valid credentials for a real deployment.
 - The payment gateway is a stub on the backend. This app never handles card
   numbers; it redirects to the provider URL returned by the API.
-- This repository is not accepting external contributions; see
-  [LICENSE](LICENSE).
+- The project is MIT licensed; see [LICENSE](LICENSE).

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Wild Life \u2014 Hunting & Fishing Store storefront (React 19 + TypeScript + Vite)",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": {
     "name": "Tiago Pires",
     "email": "tiagofsantospires@gmail.com"

@@ -5,13 +5,14 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-414%20passing-brightgreen)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
 **Wild Life** is the storefront for the Hunting & Fishing Store: a React single-page
 app for a regulated sporting-goods retailer. It covers the whole customer journey —
 catalog, cart, checkout with licence verification, payments, account and order
 history — plus a complete admin console.
 
-It is a **proprietary portfolio project**, published so reviewers can read the code.
+It is a **training and portfolio project**, published under the MIT licence.
 The API lives in a separate repository,
 [hunting-fishing-store](https://github.com/tiagofsps/hunting-fishing-store).
 
@@ -173,9 +174,10 @@ See [docs/testing.md](docs/testing.md) for the harness and conventions.
 - [Testing guide](docs/testing.md)
 - [Changelog](CHANGELOG.md)
 
-## License / Usage
+## License
 
-This repository is **not open source**. It is published for portfolio and review
-purposes only; no permission is granted to use, copy, modify or distribute the
-code without written permission. See [LICENSE](LICENSE) and
-[SECURITY.md](SECURITY.md).
+[MIT](LICENSE) © 2026 Tiago Pires.
+
+You are free to use, copy, modify and distribute this code. It was written as a
+training and portfolio project, so treat it as a reference rather than a
+production system.
