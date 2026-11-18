@@ -5,7 +5,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    # Version updates are disabled to keep the PR list clean; security updates
+    # still open automatically.
+    open-pull-requests-limit: 0
     ignore:
       # typescript-eslint does not support TypeScript 7 yet.
       - dependency-name: typescript
@@ -36,3 +38,4 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
