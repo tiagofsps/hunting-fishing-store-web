@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatAttributes, parseAttributes, toOptionalNumber } from './utils';
+import {
+  formatAttributes,
+  parseAttributes,
+  toAdminBrandPayload,
+  toAdminCategoryPayload,
+  toOptionalNumber,
+} from './utils';
 
 describe('toOptionalNumber', () => {
   it('treats a blank input as absent so optional fields accept it', () => {
@@ -51,5 +57,54 @@ describe('formatAttributes', () => {
   it('round-trips through parseAttributes', () => {
     const original = { size: 'Large', color: 'blue' };
     expect(parseAttributes(formatAttributes(original))).toEqual(original);
+  });
+});
+
+describe('admin category and brand payload mapping', () => {
+  it('includes English canonical content and only includes Portuguese content when provided', () => {
+    const category = toAdminCategoryPayload({
+      name: 'Rods',
+      namePt: '',
+      slug: 'rods',
+      description: 'Fishing rods',
+      descriptionPt: '',
+      parentCategoryId: undefined,
+    });
+    expect(category).toEqual({
+      name: 'Rods',
+      slug: 'rods',
+      description: 'Fishing rods',
+      translations: { en: { name: 'Rods', description: 'Fishing rods' } },
+    });
+
+    const bilingual = toAdminCategoryPayload({
+      name: 'Rods',
+      namePt: 'Canas',
+      slug: 'rods',
+      description: '',
+      descriptionPt: 'Canas de pesca',
+      parentCategoryId: 2,
+    });
+    expect(bilingual).toEqual({
+      name: 'Rods',
+      slug: 'rods',
+      translations: {
+        en: { name: 'Rods' },
+        pt: { name: 'Canas', description: 'Canas de pesca' },
+      },
+      parentCategoryId: 2,
+    });
+  });
+
+  it('omits an empty optional logo URL', () => {
+    expect(toAdminBrandPayload({ name: 'Acme', slug: 'acme', logoUrl: '' })).toEqual({
+      name: 'Acme',
+      slug: 'acme',
+    });
+    expect(toAdminBrandPayload({ name: 'Acme', slug: 'acme', logoUrl: '/brands/acme.svg' })).toEqual({
+      name: 'Acme',
+      slug: 'acme',
+      logoUrl: '/brands/acme.svg',
+    });
   });
 });

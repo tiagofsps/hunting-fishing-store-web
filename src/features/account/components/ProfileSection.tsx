@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from '../validation';
@@ -15,6 +15,7 @@ interface ProfileSectionProps {
 
 export default function ProfileSection({ user, isSaving, onSave }: ProfileSectionProps) {
   const { t } = useLanguage();
+  const id = useId();
   const [saved, setSaved] = useState(false);
 
   const form = useForm<ProfileFormData>({
@@ -57,21 +58,21 @@ export default function ProfileSection({ user, isSaving, onSave }: ProfileSectio
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>
-          <Label>{t('account.email')}</Label>
-          <Input type="email" value={user.email} disabled className="opacity-60" />
+          <Label htmlFor={`${id}-email`}>{t('account.email')}</Label>
+          <Input id={`${id}-email`} type="email" value={user.email} disabled className="opacity-60" />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <Label>{t('account.firstName')}</Label>
-            <Input type="text" {...form.register('firstName')} />
+            <Label htmlFor={`${id}-firstName`}>{t('account.firstName')}</Label>
+            <Input id={`${id}-firstName`} type="text" {...form.register('firstName')} />
             {form.formState.errors.firstName && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
             )}
           </div>
           <div>
-            <Label>{t('account.lastName')}</Label>
-            <Input type="text" {...form.register('lastName')} />
+            <Label htmlFor={`${id}-lastName`}>{t('account.lastName')}</Label>
+            <Input id={`${id}-lastName`} type="text" {...form.register('lastName')} />
             {form.formState.errors.lastName && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
             )}
@@ -79,24 +80,24 @@ export default function ProfileSection({ user, isSaving, onSave }: ProfileSectio
         </div>
 
         <div>
-          <Label>
+          <Label htmlFor={`${id}-phone`}>
             {t('account.phone')} <span className="font-medium text-muted">({t('account.optional')})</span>
           </Label>
-          <Input type="tel" {...form.register('phone')} />
+          <Input id={`${id}-phone`} type="tel" {...form.register('phone')} />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <Label>
+            <Label htmlFor={`${id}-huntingLicense`}>
               {t('account.huntingLicense')} <span className="font-medium text-muted">({t('account.optional')})</span>
             </Label>
-            <Input type="text" {...form.register('huntingLicenseNumber')} />
+            <Input id={`${id}-huntingLicense`} type="text" {...form.register('huntingLicenseNumber')} />
           </div>
           <div>
-            <Label>
+            <Label htmlFor={`${id}-fishingLicense`}>
               {t('account.fishingLicense')} <span className="font-medium text-muted">({t('account.optional')})</span>
             </Label>
-            <Input type="text" {...form.register('fishingLicenseNumber')} />
+            <Input id={`${id}-fishingLicense`} type="text" {...form.register('fishingLicenseNumber')} />
           </div>
         </div>
 

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getCategories } from '../../../lib/catalogApi';
-import { createCategory, updateCategory, deleteCategory, type AdminCategoryPayload } from '../api';
+import { createCategory, updateCategory, deleteCategory } from '../api';
 import { adminCategorySchema, type AdminCategoryFormData } from '../validation';
+import { toAdminCategoryPayload } from '../utils';
 import type { Category } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
@@ -12,31 +13,9 @@ import { Label } from '../../../components/ui/Label';
 import { Select } from '../../../components/ui/Select';
 import { Textarea } from '../../../components/ui/Textarea';
 
-function toPayload(data: AdminCategoryFormData): AdminCategoryPayload {
-  return {
-    name: data.name,
-    slug: data.slug,
-    ...(data.description ? { description: data.description } : {}),
-    translations: {
-      en: {
-        name: data.name,
-        ...(data.description ? { description: data.description } : {}),
-      },
-      ...(data.namePt
-        ? {
-            pt: {
-              name: data.namePt,
-              ...(data.descriptionPt ? { description: data.descriptionPt } : {}),
-            },
-          }
-        : {}),
-    },
-    ...(data.parentCategoryId ? { parentCategoryId: data.parentCategoryId } : {}),
-  };
-}
-
 export default function AdminCategoriesPage() {
   const { t } = useLanguage();
+  const id = useId();
   const describeError = useAdminError();
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -94,8 +73,8 @@ export default function AdminCategoriesPage() {
     setError('');
     setIsSaving(true);
     try {
-      if (editingId) await updateCategory(editingId, toPayload(data));
-      else await createCategory(toPayload(data));
+      if (editingId) await updateCategory(editingId, toAdminCategoryPayload(data));
+      else await createCategory(toAdminCategoryPayload(data));
       reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
@@ -135,16 +114,16 @@ export default function AdminCategoriesPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <Label>{t('admin.nameEn')}</Label>
-            <Input type="text" {...form.register('name')} />
+            <Label htmlFor={`${id}-name`}>{t('admin.nameEn')}</Label>
+            <Input id={`${id}-name`} type="text" {...form.register('name')} />
           </div>
           <div>
-            <Label>{t('admin.namePt')}</Label>
-            <Input type="text" {...form.register('namePt')} />
+            <Label htmlFor={`${id}-namePt`}>{t('admin.namePt')}</Label>
+            <Input id={`${id}-namePt`} type="text" {...form.register('namePt')} />
           </div>
           <div>
-            <Label>{t('admin.productSlug')}</Label>
-            <Input type="text" {...form.register('slug')} />
+            <Label htmlFor={`${id}-slug`}>{t('admin.productSlug')}</Label>
+            <Input id={`${id}-slug`} type="text" {...form.register('slug')} />
             {form.formState.errors.slug && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.slugInvalid')}</p>
             )}
@@ -152,20 +131,23 @@ export default function AdminCategoriesPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label>{t('admin.descriptionEn')}</Label>
-            <Textarea rows={2} {...form.register('description')} />
+            <Label htmlFor={`${id}-description`}>{t('admin.descriptionEn')}</Label>
+            <Textarea id={`${id}-description`} rows={2} {...form.register('description')} />
           </div>
           <div>
-            <Label>{t('admin.descriptionPt')}</Label>
-            <Textarea rows={2} {...form.register('descriptionPt')} />
+            <Label htmlFor={`${id}-descriptionPt`}>{t('admin.descriptionPt')}</Label>
+            <Textarea id={`${id}-descriptionPt`} rows={2} {...form.register('descriptionPt')} />
           </div>
         </div>
         <div>
-          <Label>{t('admin.parentCategory')}</Label>
+          <Label htmlFor={`${id}-parentCategory`}>{t('admin.parentCategory')}</Label>
           <Select
-            {...form.register('parentCategoryId', { valueAsNumber: true })}
+            id={`${id}-parentCategory`}
+            {...form.register('parentCategoryId', {
+              setValueAs: (value) => (value === '' ? undefined : Number(value)),
+            })}
           >
-            <option value={Number.NaN}>{t('admin.noParent')}</option>
+            <option value="">{t('admin.noParent')}</option>
             {categories
               .filter((category) => category.id !== editingId)
               .map((category) => (

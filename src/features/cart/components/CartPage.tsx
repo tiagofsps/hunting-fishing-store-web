@@ -108,6 +108,7 @@ export default function CartPage() {
                       <button
                         onClick={() => removeItem(item.product.id, sku)}
                         title={t('cart.removeTooltip')}
+                        aria-label={`${t('cart.removeTooltip')}: ${productText.name}`}
                         className="shrink-0 text-muted transition-colors hover:text-sale"
                       >
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
@@ -121,7 +122,7 @@ export default function CartPage() {
                         <button
                           onClick={() => updateQuantity(item.product.id, sku, -1)}
                           className="flex h-6 w-6 items-center justify-center font-bold text-body hover:text-ink"
-                          aria-label="-"
+                          aria-label={`${t('cart.decreaseQuantity')}: ${productText.name}`}
                         >
                           −
                         </button>
@@ -129,7 +130,7 @@ export default function CartPage() {
                         <button
                           onClick={() => updateQuantity(item.product.id, sku, 1)}
                           className="flex h-6 w-6 items-center justify-center font-bold text-body hover:text-ink"
-                          aria-label="+"
+                          aria-label={`${t('cart.increaseQuantity')}: ${productText.name}`}
                         >
                           +
                         </button>

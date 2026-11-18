@@ -53,6 +53,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
           <button
             onClick={onClose}
             className="absolute right-4 top-4 z-10 rounded-full p-2 text-muted hover:bg-surface-hover hover:text-ink transition-colors"
+            aria-label={t('common.close')}
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

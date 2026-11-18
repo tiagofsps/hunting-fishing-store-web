@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { passwordSchema, type PasswordFormData } from '../validation';
@@ -13,6 +13,7 @@ interface PasswordSectionProps {
 
 export default function PasswordSection({ isSaving, onChangePassword }: PasswordSectionProps) {
   const { t } = useLanguage();
+  const id = useId();
   const [changed, setChanged] = useState(false);
 
   const form = useForm<PasswordFormData>({
@@ -40,22 +41,22 @@ export default function PasswordSection({ isSaving, onChangePassword }: Password
 
       <form onSubmit={handleSubmit} className="mt-6 max-w-md space-y-5">
         <div>
-          <Label>{t('account.currentPassword')}</Label>
-          <Input type="password" autoComplete="current-password" {...form.register('currentPassword')} />
+          <Label htmlFor={`${id}-currentPassword`}>{t('account.currentPassword')}</Label>
+          <Input id={`${id}-currentPassword`} type="password" autoComplete="current-password" {...form.register('currentPassword')} />
           {form.formState.errors.currentPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
           )}
         </div>
         <div>
-          <Label>{t('account.newPassword')}</Label>
-          <Input type="password" autoComplete="new-password" {...form.register('newPassword')} />
+          <Label htmlFor={`${id}-newPassword`}>{t('account.newPassword')}</Label>
+          <Input id={`${id}-newPassword`} type="password" autoComplete="new-password" {...form.register('newPassword')} />
           {form.formState.errors.newPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">{t('account.errorRequired')}</p>
           )}
         </div>
         <div>
-          <Label>{t('account.confirmPassword')}</Label>
-          <Input type="password" autoComplete="new-password" {...form.register('confirmPassword')} />
+          <Label htmlFor={`${id}-confirmPassword`}>{t('account.confirmPassword')}</Label>
+          <Input id={`${id}-confirmPassword`} type="password" autoComplete="new-password" {...form.register('confirmPassword')} />
           {form.formState.errors.confirmPassword && (
             <p className="mt-1 text-[11px] font-bold text-sale">
               {form.formState.errors.confirmPassword.message === 'passwordsDoNotMatch'

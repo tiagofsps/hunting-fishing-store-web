@@ -34,3 +34,38 @@ export function formatAttributes(attributes: Record<string, unknown> | null | un
     .map(([key, value]) => `${key}=${value}`)
     .join(', ');
 }
+
+/** Maps the category form into canonical and optional translated API fields. */
+export function toAdminCategoryPayload(data: AdminCategoryFormData): AdminCategoryPayload {
+  return {
+    name: data.name,
+    slug: data.slug,
+    ...(data.description ? { description: data.description } : {}),
+    translations: {
+      en: {
+        name: data.name,
+        ...(data.description ? { description: data.description } : {}),
+      },
+      ...(data.namePt
+        ? {
+            pt: {
+              name: data.namePt,
+              ...(data.descriptionPt ? { description: data.descriptionPt } : {}),
+            },
+          }
+        : {}),
+    },
+    ...(data.parentCategoryId ? { parentCategoryId: data.parentCategoryId } : {}),
+  };
+}
+
+/** Maps the brand form and omits an empty optional logo URL. */
+export function toAdminBrandPayload(data: AdminBrandFormData): AdminBrandPayload {
+  return {
+    name: data.name,
+    slug: data.slug,
+    ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
+  };
+}
+import type { AdminBrandPayload, AdminCategoryPayload } from './api';
+import type { AdminBrandFormData, AdminCategoryFormData } from './validation';

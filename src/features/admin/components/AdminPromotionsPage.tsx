@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -12,6 +12,7 @@ import { adminPromotionSchema, type AdminPromotionFormData } from '../validation
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
+import { toOptionalNumber } from '../utils';
 import { Input } from '../../../components/ui/Input';
 import { Label } from '../../../components/ui/Label';
 import { Select } from '../../../components/ui/Select';
@@ -24,6 +25,7 @@ const TARGET_KEYS: Record<PromotionTargetType, string> = {
 
 export default function AdminPromotionsPage() {
   const { t } = useLanguage();
+  const id = useId();
   const describeError = useAdminError();
   const [promotions, setPromotions] = useState<AdminPromotion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,19 +134,20 @@ export default function AdminPromotionsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-4">
           <div className="sm:col-span-2">
-            <Label>{t('admin.promotionName')}</Label>
-            <Input type="text" {...form.register('name')} />
+            <Label htmlFor={`${id}-name`}>{t('admin.promotionName')}</Label>
+            <Input id={`${id}-name`} type="text" {...form.register('name')} />
           </div>
           <div>
-            <Label>{t('admin.discountType')}</Label>
-            <Select {...form.register('discountType')}>
+            <Label htmlFor={`${id}-discountType`}>{t('admin.discountType')}</Label>
+            <Select id={`${id}-discountType`} {...form.register('discountType')}>
               <option value="PERCENTAGE">{t('admin.discountPercentage')}</option>
               <option value="FIXED_AMOUNT">{t('admin.discountFixed')}</option>
             </Select>
           </div>
           <div>
-            <Label>{t('admin.discountValue')}</Label>
+            <Label htmlFor={`${id}-discountValue`}>{t('admin.discountValue')}</Label>
             <Input
+              id={`${id}-discountValue`}
               type="number"
               step="0.01"
               {...form.register('discountValue', { valueAsNumber: true })}
@@ -154,19 +157,20 @@ export default function AdminPromotionsPage() {
 
         <div className="grid gap-4 sm:grid-cols-4">
           <div>
-            <Label>{t('admin.priority')}</Label>
+            <Label htmlFor={`${id}-priority`}>{t('admin.priority')}</Label>
             <Input
+              id={`${id}-priority`}
               type="number"
-              {...form.register('priority', { valueAsNumber: true })}
+              {...form.register('priority', { setValueAs: toOptionalNumber })}
             />
           </div>
           <div>
-            <Label>{t('admin.validFrom')}</Label>
-            <Input type="datetime-local" {...form.register('validFrom')} />
+            <Label htmlFor={`${id}-validFrom`}>{t('admin.validFrom')}</Label>
+            <Input id={`${id}-validFrom`} type="datetime-local" {...form.register('validFrom')} />
           </div>
           <div>
-            <Label>{t('admin.validTo')}</Label>
-            <Input type="datetime-local" {...form.register('validTo')} />
+            <Label htmlFor={`${id}-validTo`}>{t('admin.validTo')}</Label>
+            <Input id={`${id}-validTo`} type="datetime-local" {...form.register('validTo')} />
             {form.formState.errors.validTo && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.validRangeInvalid')}</p>
             )}
@@ -199,12 +203,13 @@ export default function AdminPromotionsPage() {
             <ul className="space-y-2">
               {rulesField.fields.map((field, index) => (
                 <li key={field.id} className="grid gap-3 sm:grid-cols-3">
-                  <Select {...form.register(`rules.${index}.targetType`)}>
+                  <Select aria-label={`${t('admin.promotionRules')} ${index + 1} ${t('admin.targetType')}`} {...form.register(`rules.${index}.targetType`)}>
                     <option value="CATEGORY">{t('admin.targetCategory')}</option>
                     <option value="BRAND">{t('admin.targetBrand')}</option>
                     <option value="PRODUCT">{t('admin.targetProduct')}</option>
                   </Select>
                   <Input
+                    aria-label={`${t('admin.promotionRules')} ${index + 1} ${t('admin.targetId')}`}
                     type="number"
                     {...form.register(`rules.${index}.targetId`, { valueAsNumber: true })}
                   />

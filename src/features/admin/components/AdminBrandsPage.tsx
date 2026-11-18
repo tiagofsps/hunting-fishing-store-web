@@ -1,25 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBrands } from '../../../lib/catalogApi';
-import { createBrand, updateBrand, deleteBrand, type AdminBrandPayload } from '../api';
+import { createBrand, updateBrand, deleteBrand } from '../api';
 import { adminBrandSchema, type AdminBrandFormData } from '../validation';
+import { toAdminBrandPayload } from '../utils';
 import type { Brand } from '../../../types';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
 import { Input } from '../../../components/ui/Input';
 import { Label } from '../../../components/ui/Label';
 
-function toPayload(data: AdminBrandFormData): AdminBrandPayload {
-  return {
-    name: data.name,
-    slug: data.slug,
-    ...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
-  };
-}
-
 export default function AdminBrandsPage() {
   const { t } = useLanguage();
+  const id = useId();
   const describeError = useAdminError();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -68,8 +62,8 @@ export default function AdminBrandsPage() {
     setError('');
     setIsSaving(true);
     try {
-      if (editingId) await updateBrand(editingId, toPayload(data));
-      else await createBrand(toPayload(data));
+      if (editingId) await updateBrand(editingId, toAdminBrandPayload(data));
+      else await createBrand(toAdminBrandPayload(data));
       reset();
       setReloadToken((token) => token + 1);
     } catch (err) {
@@ -107,20 +101,20 @@ export default function AdminBrandsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label>{t('admin.productName')}</Label>
-            <Input type="text" {...form.register('name')} />
+            <Label htmlFor={`${id}-name`}>{t('admin.productName')}</Label>
+            <Input id={`${id}-name`} type="text" {...form.register('name')} />
           </div>
           <div>
-            <Label>{t('admin.productSlug')}</Label>
-            <Input type="text" {...form.register('slug')} />
+            <Label htmlFor={`${id}-slug`}>{t('admin.productSlug')}</Label>
+            <Input id={`${id}-slug`} type="text" {...form.register('slug')} />
             {form.formState.errors.slug && (
               <p className="mt-1 text-[11px] font-bold text-sale">{t('admin.slugInvalid')}</p>
             )}
           </div>
         </div>
         <div>
-          <Label>{t('admin.logoUrl')}</Label>
-          <Input type="text" {...form.register('logoUrl')} />
+          <Label htmlFor={`${id}-logoUrl`}>{t('admin.logoUrl')}</Label>
+          <Input id={`${id}-logoUrl`} type="text" {...form.register('logoUrl')} />
         </div>
 
         <div className="flex items-center gap-3">

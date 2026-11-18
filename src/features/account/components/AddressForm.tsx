@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { accountAddressSchema, type AccountAddressFormData } from '../validation';
@@ -17,6 +18,7 @@ interface AddressFormProps {
 
 export default function AddressForm({ address, isSaving, submitLabel, onSubmit, onCancel }: AddressFormProps) {
   const { t } = useLanguage();
+  const id = useId();
 
   const form = useForm<AccountAddressFormData>({
     resolver: zodResolver(accountAddressSchema),
@@ -37,44 +39,44 @@ export default function AddressForm({ address, isSaving, submitLabel, onSubmit, 
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-border bg-surface p-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label>{t('account.recipientName')}</Label>
-          <Input type="text" {...form.register('recipientName')} />
+          <Label htmlFor={`${id}-recipientName`}>{t('account.recipientName')}</Label>
+          <Input id={`${id}-recipientName`} type="text" {...form.register('recipientName')} />
           {form.formState.errors.recipientName && required}
         </div>
         <div>
-          <Label>{t('account.recipientPhone')}</Label>
-          <Input type="tel" {...form.register('recipientPhone')} />
+          <Label htmlFor={`${id}-recipientPhone`}>{t('account.recipientPhone')}</Label>
+          <Input id={`${id}-recipientPhone`} type="tel" {...form.register('recipientPhone')} />
           {form.formState.errors.recipientPhone && required}
         </div>
       </div>
 
       <div>
-        <Label>{t('account.street')}</Label>
-        <Input type="text" {...form.register('street')} />
+        <Label htmlFor={`${id}-street`}>{t('account.street')}</Label>
+        <Input id={`${id}-street`} type="text" {...form.register('street')} />
         {form.formState.errors.street && required}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-1">
-          <Label>{t('account.postalCode')}</Label>
-          <Input type="text" {...form.register('postalCode')} />
+          <Label htmlFor={`${id}-postalCode`}>{t('account.postalCode')}</Label>
+          <Input id={`${id}-postalCode`} type="text" {...form.register('postalCode')} />
           {form.formState.errors.postalCode && required}
         </div>
         <div className="sm:col-span-1">
-          <Label>{t('account.city')}</Label>
-          <Input type="text" {...form.register('city')} />
+          <Label htmlFor={`${id}-city`}>{t('account.city')}</Label>
+          <Input id={`${id}-city`} type="text" {...form.register('city')} />
           {form.formState.errors.city && required}
         </div>
         <div className="sm:col-span-1">
-          <Label>{t('account.countryCode')}</Label>
-          <Input type="text" maxLength={2} {...form.register('countryCode')} />
+          <Label htmlFor={`${id}-countryCode`}>{t('account.countryCode')}</Label>
+          <Input id={`${id}-countryCode`} type="text" maxLength={2} {...form.register('countryCode')} />
           {form.formState.errors.countryCode && required}
         </div>
       </div>
 
       <div>
-        <Label>{t('account.addressType')}</Label>
-        <Select {...form.register('addressType')}>
+        <Label htmlFor={`${id}-addressType`}>{t('account.addressType')}</Label>
+        <Select id={`${id}-addressType`} {...form.register('addressType')}>
           <option value="SHIPPING">{t('account.addressTypeShipping')}</option>
           <option value="BILLING">{t('account.addressTypeBilling')}</option>
         </Select>

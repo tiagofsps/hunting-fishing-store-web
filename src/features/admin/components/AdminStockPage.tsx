@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getProductsPage } from '../../../lib/catalogApi';
@@ -19,6 +19,7 @@ const MOVEMENT_LABELS: Record<StockMovementFormData['type'], string> = {
 
 export default function AdminStockPage() {
   const { t } = useLanguage();
+  const id = useId();
   const describeError = useAdminError();
   const [items, setItems] = useState<{ id: number; sku: string; name: string; stock: number }[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
@@ -30,7 +31,9 @@ export default function AdminStockPage() {
 
   const form = useForm<StockMovementFormData>({
     resolver: zodResolver(stockMovementSchema),
-    defaultValues: { quantity: 1, type: 'PURCHASE', notes: '' },
+    // productItemId is part of the schema (it mirrors the backend) and is set
+    // from the item selector; the form cannot submit until an item is chosen.
+    defaultValues: { productItemId: 0, quantity: 1, type: 'PURCHASE', notes: '' },
   });
 
   // Flatten the first catalog page into selectable items.
@@ -93,13 +96,13 @@ export default function AdminStockPage() {
     setIsSaving(true);
     try {
       await createStockMovement({
-        productItemId: selectedItemId,
+        productItemId: data.productItemId,
         quantity: data.quantity,
         type: data.type,
         ...(data.notes ? { notes: data.notes } : {}),
       });
       setNotice(t('admin.movementRecorded'));
-      form.reset({ quantity: 1, type: 'PURCHASE', notes: '' });
+      form.reset({ productItemId: data.productItemId, quantity: 1, type: 'PURCHASE', notes: '' });
       setMovements(await listStockMovements(selectedItemId));
     } catch (err) {
       setError(describeError(err));
@@ -129,11 +132,14 @@ export default function AdminStockPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
           <div>
-            <Label>{t('admin.selectItem')}</Label>
+            <Label htmlFor={`${id}-item`}>{t('admin.selectItem')}</Label>
             <Select
+              id={`${id}-item`}
               value={selectedItemId ?? ''}
               onChange={(event) => {
-                setSelectedItemId(event.target.value ? Number(event.target.value) : null);
+                const nextId = event.target.value ? Number(event.target.value) : null;
+                setSelectedItemId(nextId);
+                form.setValue('productItemId', nextId ?? 0, { shouldValidate: false });
                 setNotice('');
                 setMovements([]);
               }}
@@ -149,8 +155,9 @@ export default function AdminStockPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>{t('admin.quantity')}</Label>
+              <Label htmlFor={`${id}-quantity`}>{t('admin.quantity')}</Label>
               <Input
+                id={`${id}-quantity`}
                 type="number"
                 {...form.register('quantity', { valueAsNumber: true })}
               />
@@ -159,8 +166,8 @@ export default function AdminStockPage() {
               )}
             </div>
             <div>
-              <Label>{t('admin.movementType')}</Label>
-              <Select {...form.register('type')}>
+              <Label htmlFor={`${id}-type`}>{t('admin.movementType')}</Label>
+              <Select id={`${id}-type`} {...form.register('type')}>
                 {Object.entries(MOVEMENT_LABELS).map(([value, key]) => (
                   <option key={value} value={value}>
                     {t(key)}
@@ -171,8 +178,8 @@ export default function AdminStockPage() {
           </div>
 
           <div>
-            <Label>{t('admin.notes')}</Label>
-            <Input type="text" {...form.register('notes')} />
+            <Label htmlFor={`${id}-notes`}>{t('admin.notes')}</Label>
+            <Input id={`${id}-notes`} type="text" {...form.register('notes')} />
           </div>
 
           <button

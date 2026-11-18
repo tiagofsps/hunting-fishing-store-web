@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { listCoupons, createCoupon, type AdminCoupon } from '../api';
 import { adminCouponSchema, type AdminCouponFormData } from '../validation';
+import { toOptionalNumber } from '../utils';
 import { formatCurrency } from '../../../utils';
 import { useLanguage } from '../../../i18n/useLanguage';
 import { useAdminError } from '../hooks';
@@ -12,6 +13,7 @@ import { Select } from '../../../components/ui/Select';
 
 export default function AdminCouponsPage() {
   const { t } = useLanguage();
+  const id = useId();
   const describeError = useAdminError();
   const [coupons, setCoupons] = useState<AdminCoupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,19 +105,20 @@ export default function AdminCouponsPage() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-2xl border border-border bg-surface-raised p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <Label>{t('admin.couponCode')}</Label>
-            <Input type="text" {...form.register('code')} />
+            <Label htmlFor={`${id}-code`}>{t('admin.couponCode')}</Label>
+            <Input id={`${id}-code`} type="text" {...form.register('code')} />
           </div>
           <div>
-            <Label>{t('admin.discountType')}</Label>
-            <Select {...form.register('discountType')}>
+            <Label htmlFor={`${id}-discountType`}>{t('admin.discountType')}</Label>
+            <Select id={`${id}-discountType`} {...form.register('discountType')}>
               <option value="PERCENTAGE">{t('admin.discountPercentage')}</option>
               <option value="FIXED_AMOUNT">{t('admin.discountFixed')}</option>
             </Select>
           </div>
           <div>
-            <Label>{t('admin.discountValue')}</Label>
+            <Label htmlFor={`${id}-discountValue`}>{t('admin.discountValue')}</Label>
             <Input
+              id={`${id}-discountValue`}
               type="number"
               step="0.01"
               {...form.register('discountValue', { valueAsNumber: true })}
@@ -125,37 +128,40 @@ export default function AdminCouponsPage() {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <Label>{t('admin.minOrderAmount')}</Label>
+            <Label htmlFor={`${id}-minOrderAmount`}>{t('admin.minOrderAmount')}</Label>
             <Input
+              id={`${id}-minOrderAmount`}
               type="number"
               step="0.01"
-              {...form.register('minOrderAmount', { valueAsNumber: true })}
+              {...form.register('minOrderAmount', { setValueAs: toOptionalNumber })}
             />
           </div>
           <div>
-            <Label>{t('admin.usageLimit')}</Label>
+            <Label htmlFor={`${id}-usageLimit`}>{t('admin.usageLimit')}</Label>
             <Input
+              id={`${id}-usageLimit`}
               type="number"
-              {...form.register('usageLimit', { valueAsNumber: true })}
+              {...form.register('usageLimit', { setValueAs: toOptionalNumber })}
             />
           </div>
           <div>
-            <Label>{t('admin.usageLimitPerUser')}</Label>
+            <Label htmlFor={`${id}-usageLimitPerUser`}>{t('admin.usageLimitPerUser')}</Label>
             <Input
+              id={`${id}-usageLimitPerUser`}
               type="number"
-              {...form.register('usageLimitPerUser', { valueAsNumber: true })}
+              {...form.register('usageLimitPerUser', { setValueAs: toOptionalNumber })}
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label>{t('admin.validFrom')}</Label>
-            <Input type="datetime-local" {...form.register('validFrom')} />
+            <Label htmlFor={`${id}-validFrom`}>{t('admin.validFrom')}</Label>
+            <Input id={`${id}-validFrom`} type="datetime-local" {...form.register('validFrom')} />
           </div>
           <div>
-            <Label>{t('admin.validTo')}</Label>
-            <Input type="datetime-local" {...form.register('validTo')} />
+            <Label htmlFor={`${id}-validTo`}>{t('admin.validTo')}</Label>
+            <Input id={`${id}-validTo`} type="datetime-local" {...form.register('validTo')} />
           </div>
         </div>
 
