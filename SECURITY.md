@@ -23,4 +23,5 @@ amount of time to investigate and fix the issue before any public disclosure.
   development convenient. They are not valid credentials for a real deployment.
 - The payment gateway is a stub on the backend. This app never handles card
   numbers; it redirects to the provider URL returned by the API.
-- The project is MIT licensed; see [LICENSE](LICENSE).
+- The project is MIT licensed; see [LICENSE](LICENSE). It is a personal
+training project, so pull requests are not expected.

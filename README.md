@@ -12,13 +12,19 @@ app for a regulated sporting-goods retailer. It covers the whole customer journe
 catalog, cart, checkout with licence verification, payments, account and order
 history — plus a complete admin console.
 
-It is a **training and portfolio project**, published under the MIT licence.
 The API lives in a separate repository,
 [hunting-fishing-store](https://github.com/tiagofsps/hunting-fishing-store).
 
 ![Storefront home page](docs/images/storefront-home.png)
 
 ## About this project
+
+This began as a store concept a friend wanted to open. I took it on as a learning
+vehicle — Spring Boot 4 on the backend, React 19 on the frontend — and it grew into
+a complete store: catalog, cart, checkout with licence verification, payments,
+order history and an admin console. The store never went to market, so the code is
+published as a portfolio piece rather than a product. It is MIT licensed and free
+to read or reuse; contributions are not expected.
 
 Hunting and fishing gear is regulated: some products require a licence, some ship
 with legal notices, and prices change with promotions and coupons. The app has to
@@ -168,7 +174,21 @@ HTTP is mocked with MSW, so no backend is needed.
 
 See [docs/testing.md](docs/testing.md) for the harness and conventions.
 
-## Documentation
+## Tradeoffs and what I'd do differently
+
+- **The access token lives in `localStorage`.** It survives reloads without extra
+  work, but it is readable by any script. I'd move it to memory and refresh
+  silently on load, which needs a small change on the API side.
+- **Tests stop at the network boundary.** MSW gives fast, deterministic coverage of
+  every layer, but nothing proves the app against a running backend. A small
+  Playwright suite for the checkout and admin flows is the obvious next step.
+- **No container image for the SPA.** It calls same-origin `/api` paths, so it only
+  works behind a reverse proxy. Shipping an image without that contract would be
+  misleading, so deployment is documented instead of packaged.
+- **Some admin forms duplicate payload mapping.** The category and brand mappers
+  were extracted and tested, but a shared form-to-payload layer would remove the
+  remaining repetition.
+
 
 - [Frontend structure and conventions](docs/architecture/frontend-structure.md)
 - [Testing guide](docs/testing.md)
